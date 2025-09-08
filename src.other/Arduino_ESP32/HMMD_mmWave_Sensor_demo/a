@@ -1,0 +1,7 @@
+#!/bin/bash
+#abuild wrover --ip m5-core2.local $*
+abuild wrover $*
+
+
+
+
