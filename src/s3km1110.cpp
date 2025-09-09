@@ -338,7 +338,7 @@ bool s3km1110::_parseCommandFrame()
 
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("–––––––––––––––––––––––––––––––––––––––––––––"));
+        //_uartDebug->println(F("-------------------------------------------"));
         _uartDebug->print(F("RCV ACK: "));
         _printCurrentFrame();
         _uartDebug->printf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
@@ -454,6 +454,7 @@ void s3km1110::_sendHexData(String rawData)
 {
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
+        _uartDebug->println(F("-------------------------------------------"));
         _uartDebug->print(F("SND: "));
         _uartDebug->println(rawData);
     }

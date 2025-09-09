@@ -1,4 +1,5 @@
 #include <../include/s3km1110.h>
+#include "common.h"
 
 
 // give hardware serial a heads up we are not standard																		  
