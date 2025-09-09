@@ -21,9 +21,11 @@ void setup()
 	delay(100);
 	}
 
-	sendHexData(hex_to_send);  // start reporting?
+	// sendHexData(hex_to_send);  // start reporting?
 	// Hex string to send
 }
+
+#if 0
 
 void loop() 
 {
@@ -75,4 +77,5 @@ void readSerialData()
         //Serial.print(incomingByte);
     }
 }
+#endif
 
