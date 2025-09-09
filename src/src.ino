@@ -1,81 +1,42 @@
+#include <../include/s3km1110.h>
 
+
+// give hardware serial a heads up we are not standard																		  
 #define RX2 18
 #define TX2 19
-
-#include <HardwareSerial.h>
-HardwareSerial mySerial(2);
-
-String hex_to_send = "FDFCFBFA0800120000006400000004030201";
-
-void setup() 
-{
-
-	// Start the serial communication with a baud rate of 115200
-	Serial.begin(115200);
-
-	mySerial.setPins(18,19);
-	mySerial.begin(115200);
-
-	// Wait for the serial port to initialize
-	while (!Serial) {
-	delay(100);
-	}
-
-	// sendHexData(hex_to_send);  // start reporting?
-	// Hex string to send
-}
-
-#if 0
-
-void loop() 
-{
- // Read and print serial data
-  readSerialData();
-}
-
-void sendHexData(String hexString) {
-  // Convert hex string to bytes
-  int hexStringLength = hexString.length();
-  byte hexBytes[hexStringLength / 2];
-  for (int i = 0; i < hexStringLength; i += 2) {
-    hexBytes[i / 2] = strtoul(hexString.substring(i, i + 2).c_str(), NULL, 16);
-  }
-
-  // Send bytes through software serial
-  mySerial.write(hexBytes, sizeof(hexBytes));
-}
-
-void readSerialData()
-{
-    static int ctr;
-    char keeper[15];
-
-    int limit = sizeof(keeper);
-
-    // Read and print data from software serial
-    if  (mySerial.available() > 0) 
-    {
-        char incomingByte = mySerial.read();
-        keeper[ctr++] = incomingByte;
-
-        if (ctr == limit)
-        {
-            Serial.println();
-
-            for (ctr = 0; ctr < limit; ctr++)
-            {
-                Serial.printf("%02x ", keeper[ctr]);
-            }
  
-            for (ctr = 0; ctr < limit; ctr++)
-            {
-                Serial.printf("%c", (keeper[ctr] > 0x19 && keeper[ctr] < 128) ? 
-                    keeper[ctr] : '.') ;
-            }
-            ctr = 0;
-        }
-        //Serial.print(incomingByte);
+#include <HardwareSerial.h>
+HardwareSerial customSerial(2);
+
+s3km1110 radar;
+
+uint32_t lastReading = 0;
+
+void setup(void) {
+    Serial.begin(115200);
+
+	customSerial.setPins(RX2, TX2);  // runtime overide
+    customSerial.begin(115200);
+
+    bool isRadarEnabled = radar.begin(customSerial, Serial);
+    Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");
+
+    if (isRadarEnabled && radar.readAllRadarConfigs()) {
+        auto config = radar.radarConfiguration;
+        Serial.printf("[Info] Radar config:\n |- Gates  | Min: %u\t| Max: %u\n |- Frames | Detect: %u\t| Disappear: %u\n |- Disappearance delay: %u\n",
+                    config->detectionGatesMin, config->detectionGatesMax, config->activeFrameNum, config->inactiveFrameNum, config->delay);
     }
 }
-#endif
 
+void loop() {
+    if (radar.isConnected()) {
+        lastReading = millis();
+        while (millis() - lastReading < 2000) {
+            if (radar.read()) {
+                // Get radar info
+                bool isDetected = radar.isTargetDetected;
+                int16_t targetDistance = radar.distanceToTarget;
+            }
+        }
+    }
+}

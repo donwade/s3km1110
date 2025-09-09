@@ -1,7 +1,7 @@
 #ifndef s3km1110_cpp
 #define s3km1110_cpp
 
-#include "s3km1110.h"
+#include "../include/s3km1110.h"
 
 #define S3KM1110_FRAME_COMMAND_SIZE 2
 #define S3KM1110_FRAME_LENGTH_SIZE 2

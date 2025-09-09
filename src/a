@@ -1,6 +1,6 @@
 #!/bin/bash
 #abuild wrover --ip m5-core2.local $*
-abuild wrover $*
+abuild wrover  -DS3KM1110_DEBUG_DATA -Dvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv $*
 
 
 
