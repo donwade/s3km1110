@@ -12,11 +12,11 @@
 
 struct s3km1110ConfigParameters
 {
-    uint8_t *detectionGatesMin = nullptr;   // 0~15 | Minimum detection distance gate
-    uint8_t *detectionGatesMax = nullptr;   // 0~15 | Maximum detection distance gate
-    uint8_t *activeFrameNum = nullptr;      // Minimum frame number of detected target
-    uint8_t *inactiveFrameNum = nullptr;    // Minimum number of frames when the target disappears 
-    uint16_t *delay = nullptr;              // 0~65535 | Target disappearance delay time (sec)
+    uint8_t detectionGatesMin;   // 0~15 | Minimum detection distance gate
+    uint8_t detectionGatesMax;   // 0~15 | Maximum detection distance gate
+    uint8_t activeFrameNum;      // Minimum frame number of detected target
+    uint8_t inactiveFrameNum;    // Minimum number of frames when the target disappears 
+    uint16_t delay;              // 0~65535 | Target disappearance delay time (sec)
 };
 
 class s3km1110 {

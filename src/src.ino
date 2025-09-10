@@ -35,8 +35,21 @@ void loop() {
         while (millis() - lastReading < 2000) {
             if (radar.read()) {
                 // Get radar info
-                bool isDetected = radar.isTargetDetected;
+                bool isDetected = radar.isTargetDetected;		
                 int16_t targetDistance = radar.distanceToTarget;
+
+				uint16_t auxDistanceCm = targetDistance;
+				uint16_t inches = (float) auxDistanceCm / 2.54;
+				uint16_t feet = inches/12;
+				uint16_t in = inches - feet * 12;
+				TRACE("detected = %s distance =%d cm %d in\n", 
+						isDetected?"YES": "NO", 
+						targetDistance,
+						inches);
+				
+				TRACE("detected = %s distance =%d ft %d in\n", 
+						isDetected?"YES": "NO", 
+						feet, in);
             }
         }
     }
