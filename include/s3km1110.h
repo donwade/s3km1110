@@ -16,7 +16,7 @@ struct s3km1110ConfigParameters
     uint8_t detectionGatesMax;   // 0~15 | Maximum detection distance gate
     uint8_t activeFrameNum;      // Minimum frame number of detected target
     uint8_t inactiveFrameNum;    // Minimum number of frames when the target disappears 
-    uint16_t delay;              // 0~65535 | Target disappearance delay time (sec)
+    uint16_t disappearDelay;              // 0~65535 | Target disappearance delay time (sec)
 };
 
 class s3km1110 {
@@ -70,7 +70,7 @@ class s3km1110 {
         bool _isCommandFrame = false;
 
         uint8_t mlastRxCommand = 0;
-        uint8_t _lastRadarConfigCommand = 0;
+        uint8_t commandRequested = 0;
         bool mbLastRxCmdValid = false;
 
         bool _enableReportMode();

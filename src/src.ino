@@ -20,12 +20,16 @@ void setup(void) {
     customSerial.begin(115200);
 
     bool isRadarEnabled = radar.begin(customSerial, Serial);
+	Serial.printf ("\033[2J\033[H\033[3J"); //putty clear screen and buffer
+	
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");
 
-    if (isRadarEnabled && radar.readAllRadarConfigs()) {
+    if (isRadarEnabled && radar.readAllRadarConfigs())
+	{
         auto config = radar.radarConfiguration;
         Serial.printf("[Info] Radar config:\n |- Gates  | Min: %u\t| Max: %u\n |- Frames | Detect: %u\t| Disappear: %u\n |- Disappearance delay: %u\n",
-                    config->detectionGatesMin, config->detectionGatesMax, config->activeFrameNum, config->inactiveFrameNum, config->delay);
+                    config->detectionGatesMin, config->detectionGatesMax, config->activeFrameNum, config->inactiveFrameNum, config->disappearDelay);
+		delay(4000);
     }
 }
 
