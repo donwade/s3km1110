@@ -33,6 +33,8 @@
 
 struct s3km1110ConfigParameters parkingLot;
 
+#define min(a,b) (((a) < (b)) ? (a) :(b))
+#define max(a,b) (((a) > (b)) ? (a) :(b))
 
 s3km1110::s3km1110() : radarConfiguration(&parkingLot) {};
 s3km1110::~s3km1110() = default;
@@ -90,16 +92,18 @@ bool s3km1110::readSerialNumber()
 
 bool s3km1110::setRadarConfigurationMinimumGates(uint8_t gates)
 {
-    uint8_t newValue = max((uint8_t)0, min((uint8_t)15, gates));
+    uint8_t newValue = max(0, min(15, gates));
     bool isSuccess = _setParameterConfiguration(S3KM1110_RADAR_CONFIG_DETECTION_DISTANCE_MIN, newValue);
+	TRACE("setting minimum number of gates to %d = %s\n", newValue, isSuccess? "PASS":"FAIL");
     if (isSuccess) { radarConfiguration->detectionGatesMin = newValue; }
     return isSuccess;
 }
 
 bool s3km1110::setRadarConfigurationMaximumGates(uint8_t gates)
 {
-    uint8_t newValue = max((uint8_t)0, min((uint8_t)15, gates));
+    uint8_t newValue = max(0, min(15, gates));
     bool isSuccess = _setParameterConfiguration(S3KM1110_RADAR_CONFIG_DETECTION_DISTANCE_MAX, newValue);
+	TRACE("setting minimum number of gates to %d = %s\n", newValue, isSuccess? "PASS":"FAIL");
     if (isSuccess) { radarConfiguration->detectionGatesMax = newValue; }
     return isSuccess;
 }
