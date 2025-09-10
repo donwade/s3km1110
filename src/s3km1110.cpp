@@ -360,38 +360,56 @@ bool s3km1110::_parseDataFrame()
     return false;
 }
 
+//---------------------------------------------------------------------
+
 bool s3km1110::_parseCommandFrame()
 {
-    uint8_t frame_data_length = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
+    uint8_t totalFrameSize = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
 
-    _lastCommand = _radarDataFrame[6];
-    _isLatestCommandSuccess = (_radarDataFrame[8] == 0x00 && _radarDataFrame[9] == 0x00);
+    mlastRxCommand = _radarDataFrame[6];
+    mbLastRxCmdValid = (_radarDataFrame[8] == 0x00 && _radarDataFrame[9] == 0x00);
 
-    bool isWithPayloadSize = false;
-    if (_lastCommand == S3KM1110_RADAR_COMMAND_READ_SERIAL_NUMBER || _lastCommand == S3KM1110_RADAR_COMMAND_READ_FIRMWARE_VERSION) {
-        isWithPayloadSize = true;
+    bool bRxPayloadHasSize = false;
+	
+    if (   mlastRxCommand == S3KM1110_RADAR_COMMAND_READ_SERIAL_NUMBER 
+		|| mlastRxCommand == S3KM1110_RADAR_COMMAND_READ_FIRMWARE_VERSION) 
+	{
+        bRxPayloadHasSize = true;
     }
 
-    uint8_t startPayloadPosition = isWithPayloadSize ? 12 : 10;
-    int16_t frame_payload_length = _radarDataFramePosition - 4 - startPayloadPosition;
+    uint8_t startPayloadPosition = bRxPayloadHasSize ? 12 : 10;
+	
+    int16_t payloadLength = _radarDataFramePosition - 4 - startPayloadPosition;
 
-    char payloadBytes[frame_payload_length + 1] = {0};
-    if (frame_payload_length > 0) {
-        for (uint8_t idx = 0; idx < frame_payload_length; idx++) {
-            payloadBytes[idx] = _radarDataFrame[startPayloadPosition + idx];
+    char payloadRxBytes[payloadLength + 1] = {0};
+
+	// take packet payload and copy into buffer.
+    if (payloadLength > 0) 
+	{
+        for (uint8_t idx = 0; idx < payloadLength; idx++) 
+		{
+            payloadRxBytes[idx] = _radarDataFrame[startPayloadPosition + idx];
         }
     }
 
     #ifdef S3KM1110_DEBUG_COMMANDS
-    if (_uartDebug != nullptr) {
+    if (_uartDebug != nullptr) 
+	{
         //_uartDebug->println(F("-------------------------------------------"));
         _uartDebug->print(F("RCV ACK: "));
         _printCurrentFrame();
-        _uartDebug->printf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
-        if (frame_payload_length > 0) {
+        _uartDebug->printf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", 
+				mlastRxCommand, 
+				mbLastRxCmdValid ? "Ok" : "Failed", 
+				totalFrameSize, 
+				payloadLength);
+
+        if (payloadLength > 0) 
+		{
             _uartDebug->print(F("Raw payload: "));
-            for (uint8_t idx = 0; idx < frame_payload_length; idx++) {
-                _uartDebug->printf("%02x ", payloadBytes[idx]);
+            for (uint8_t idx = 0; idx < payloadLength; idx++)
+			{
+                _uartDebug->printf("%02x ", payloadRxBytes[idx]);
             }
             _uartDebug->print('\n');
         }
@@ -399,37 +417,41 @@ bool s3km1110::_parseCommandFrame()
     #endif
 
     bool isSuccess = false;
-    if (_lastCommand == S3KM1110_RADAR_COMMAND_OPEN_COMMAND_MODE) {
-        return _isLatestCommandSuccess;
+    if (mlastRxCommand == S3KM1110_RADAR_COMMAND_OPEN_COMMAND_MODE) 
+	{
+        return mbLastRxCmdValid;
     }
-    else if (_lastCommand == S3KM1110_RADAR_COMMAND_CLOSE_COMMAND_MODE) {
-        return _isLatestCommandSuccess;
+    else if (mlastRxCommand == S3KM1110_RADAR_COMMAND_CLOSE_COMMAND_MODE)
+	{
+        return mbLastRxCmdValid;
     }
-    else if (_lastCommand == S3KM1110_RADAR_COMMAND_SET_MODE)
+    else if (mlastRxCommand == S3KM1110_RADAR_COMMAND_SET_MODE)
     {
-        isSuccess = _isLatestCommandSuccess;
+        isSuccess = mbLastRxCmdValid;
     } 
-    else if (_lastCommand == S3KM1110_RADAR_COMMAND_READ_SERIAL_NUMBER)
+    else if (mlastRxCommand == S3KM1110_RADAR_COMMAND_READ_SERIAL_NUMBER)
     {
-        if (frame_payload_length > 0) {
-            serialNumber = new String(payloadBytes);
+        if (payloadLength > 0) 
+		{
+            serialNumber = new String(payloadRxBytes);
             isSuccess = true;
         }
     } 
-    else if (_lastCommand == S3KM1110_RADAR_COMMAND_READ_FIRMWARE_VERSION)
+    else if (mlastRxCommand == S3KM1110_RADAR_COMMAND_READ_FIRMWARE_VERSION)
     {
-        if (frame_payload_length > 0) {
-            firmwareVersion = new String(payloadBytes);
+        if (payloadLength > 0) 
+		{
+            mFirmwareVersion = new String(payloadRxBytes);
             isSuccess = true;
         }
     }
-    else if (_lastCommand == S3KM1110_RADAR_COMMAND_RADAR_SET_CONFIG) 
+    else if (mlastRxCommand == S3KM1110_RADAR_COMMAND_RADAR_SET_CONFIG) 
     {
-        return _isLatestCommandSuccess;
+        return mbLastRxCmdValid;
     }
-    else if (_lastCommand == S3KM1110_RADAR_COMMAND_RADAR_READ_CONFIG)
+    else if (mlastRxCommand == S3KM1110_RADAR_COMMAND_RADAR_READ_CONFIG)
     {
-        return _parseGetConfigCommandFrame(payloadBytes, frame_payload_length);
+        return _parseGetConfigCommandFrame(payloadRxBytes, payloadLength);
     }
     else 
     {
@@ -456,22 +478,29 @@ bool s3km1110::_parseGetConfigCommandFrame(char *payload, uint8_t count)
 	
     uint32_t result = payload[0] + (payload[1] << 8) + (payload[2] << 16) + (payload[3] << 24);
 
-    if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_DETECTION_DISTANCE_MIN) {
+    if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_DETECTION_DISTANCE_MIN) 
+	{
         
         radarConfiguration->detectionGatesMin = result;
     }
-    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_DETECTION_DISTANCE_MAX) {
+    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_DETECTION_DISTANCE_MAX) 
+	{
         radarConfiguration->detectionGatesMax = result;
     }
-    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_TARGET_ACTIVE_FRAMES) {
+    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_TARGET_ACTIVE_FRAMES) 
+	{
         radarConfiguration->activeFrameNum = result;
     }
-    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_TARGET_INACTIVE_FRAMES) {
+    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_TARGET_INACTIVE_FRAMES) 
+	{
         radarConfiguration->inactiveFrameNum = result;
     }
-    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_DISAPPEARANCE_DELAY) {
+    else if (_lastRadarConfigCommand == S3KM1110_RADAR_CONFIG_DISAPPEARANCE_DELAY) 
+	{
         radarConfiguration->delay = result;
-    } else {
+    }
+	else
+	{
         return false;
     }
 
@@ -540,7 +569,7 @@ bool s3km1110::_sendCommandAndWait(
         _radarUartLastCommandTime = millis();
         while (millis() - _radarUartLastCommandTime < kRadarUartcommandTimeout) {
             if (_read_frame()) {
-                if (_isLatestCommandSuccess && _lastCommand == command) {
+                if (mbLastRxCmdValid && mlastRxCommand == command) {
                     delay(50);
                     if (!isSkipCommandMode) { _closeCommandMode(); }
                     return true;

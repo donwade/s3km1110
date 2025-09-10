@@ -45,7 +45,7 @@ class s3km1110 {
         bool setRadarConfigurationInactiveFrameNum(uint8_t);
         bool setRadarConfigurationDelay(uint16_t);
 
-        String *firmwareVersion = nullptr;
+        String *mFirmwareVersion = nullptr;
         String *serialNumber = nullptr;
 
         s3km1110ConfigParameters *radarConfiguration;
@@ -69,9 +69,9 @@ class s3km1110 {
         bool _isFrameStarted = false;
         bool _isCommandFrame = false;
 
-        uint8_t _lastCommand = 0;
+        uint8_t mlastRxCommand = 0;
         uint8_t _lastRadarConfigCommand = 0;
-        bool _isLatestCommandSuccess = false;
+        bool mbLastRxCmdValid = false;
 
         bool _enableReportMode();
         void _printCurrentFrame();
