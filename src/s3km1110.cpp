@@ -158,7 +158,8 @@ bool s3km1110::readRadarConfigInactiveFrameNumber()
 bool s3km1110::readRadarConfigDelay()
 {
     _lastRadarConfigCommand = S3KM1110_RADAR_CONFIG_DISAPPEARANCE_DELAY;
-    return _sendCommandAndWait(S3KM1110_RADAR_COMMAND_RADAR_READ_CONFIG, S3KM1110_RADAR_CONFIG_DISAPPEARANCE_DELAY, 2);
+    bool ret = _sendCommandAndWait(S3KM1110_RADAR_COMMAND_RADAR_READ_CONFIG, S3KM1110_RADAR_CONFIG_DISAPPEARANCE_DELAY, 2);
+    return ret;
 }
 
 bool s3km1110::readAllRadarConfigs()
@@ -180,34 +181,50 @@ bool s3km1110::_read_frame()
     bool isSuccess = false;
     uint8_t _readData = _uartRadar->read();
 
-    if (_isFrameStarted == false) {
-        if (_readData == 0xF4) {
+    if (_isFrameStarted == false) 
+	{
+        if (_readData == 0xF4) 
+		{
             _radarDataFrame[_radarDataFramePosition++] = _readData;
             _isFrameStarted = true;
             _isCommandFrame = false;
-        } else if (_readData == 0xFD) {
+        }
+		else if (_readData == 0xFD) 
+		{
             _radarDataFrame[_radarDataFramePosition++] = _readData;
             _isFrameStarted = true;
             _isCommandFrame = true;
         }
-    } else {
-        if (_radarDataFramePosition >= S3KM1110_MAX_FRAME_LENGTH) {
+    } 
+	else
+	{
+        if (_radarDataFramePosition >= S3KM1110_MAX_FRAME_LENGTH) 
+		{
             #if defined(S3KM1110_DEBUG_COMMANDS) || defined(S3KM1110_DEBUG_DATA)
-            if (_uartDebug != nullptr) {
+            if (_uartDebug != nullptr) 
+			{
                 _uartDebug->println(F("[Error] Frame out of size"));
             }
             #endif
+			
             _radarDataFramePosition = 0;
             _isFrameStarted = false;
-        } else {
+			
+        } 
+		else
+		{
             _radarDataFrame[_radarDataFramePosition++] = _readData;
 
-            if (_radarDataFramePosition >= 8) {
-                if (_isDataFrameComplete()) {
+            if (_radarDataFramePosition >= 8) 
+			{
+                if (_isDataFrameComplete()) 
+				{
                     isSuccess = _parseDataFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
-                } else if (_isCommandFrameComplete()) {
+                }
+				else if (_isCommandFrameComplete()) 
+                {
                     isSuccess = _parseCommandFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
