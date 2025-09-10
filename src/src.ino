@@ -29,8 +29,12 @@ void setup(void) {
         auto config = radar.radarConfiguration;
         Serial.printf("[Info] Radar config:\n |- Gates  | Min: %u\t| Max: %u\n |- Frames | Detect: %u\t| Disappear: %u\n |- Disappearance delay: %u\n",
                     config->detectionGatesMin, config->detectionGatesMax, config->activeFrameNum, config->inactiveFrameNum, config->disappearDelay);
-		delay(4000);
     }
+
+	Serial.printf("firmware : %s\n", radar.mFirmwareVersion);
+	Serial.printf("serno    : %s\n", radar.mSerialNumber);
+
+	delay(4000);
 }
 
 void loop() {
@@ -39,7 +43,7 @@ void loop() {
         while (millis() - lastReading < 2000) {
             if (radar.read()) {
                 // Get radar info
-                bool isDetected = radar.isTargetDetected;		
+                bool isDetected = radar.bTargetDetected;		
                 int16_t targetDistance = radar.distanceToTarget;
 
 				uint16_t auxDistanceCm = targetDistance;
@@ -57,4 +61,5 @@ void loop() {
             }
         }
     }
+	
 }

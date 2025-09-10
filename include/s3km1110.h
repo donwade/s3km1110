@@ -45,12 +45,12 @@ class s3km1110 {
         bool setRadarConfigurationInactiveFrameNum(uint8_t);
         bool setRadarConfigurationDelay(uint16_t);
 
-        String *mFirmwareVersion = nullptr;
-        String *serialNumber = nullptr;
+        char  mFirmwareVersion[30];
+        char  mSerialNumber[30];
 
         s3km1110ConfigParameters *radarConfiguration;
 
-        bool isTargetDetected = false;
+        bool bTargetDetected = false;
         int16_t distanceToTarget = -1;  // Distance to the target in centimetres.
         uint16_t distanceGateEnergy[S3KM1110_DISTANCE_GATE_COUNT] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 

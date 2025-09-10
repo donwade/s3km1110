@@ -205,6 +205,8 @@ bool s3km1110::readAllRadarConfigs()
         readRadarConfigMaximumGates() &&
         readRadarConfigActiveFrameNumber() &&
         readRadarConfigInactiveFrameNumber() &&
+        readFirmwareVersion() &&
+        readSerialNumber();
         readRadarConfigDelay();
 }
 
@@ -335,12 +337,13 @@ bool s3km1110::_parseDataFrame()
 	{
         uint8_t detectionResultRaw = _radarDataFrame[6];
         distanceToTarget = _radarDataFrame[7] + (_radarDataFrame[8] << 8);
-        isTargetDetected = detectionResultRaw == 0x01;
+        bTargetDetected = detectionResultRaw == 0x01;
 
         #ifdef S3KM1110_DEBUG_DATA
         if (_uartDebug != nullptr)
 		{
-            _uartDebug->printf("Detected: %x | Distance: %u\n", detectionResultRaw, distanceToTarget);
+            _uartDebug->printf("Detected: %x | Distance: %u\n", 
+						detectionResultRaw, distanceToTarget);
             _uartDebug->print(F("Gate energy:\n"));
 
             for (uint8_t i = 0; i < S3KM1110_DISTANCE_GATE_COUNT; i++) 
@@ -469,7 +472,8 @@ bool s3km1110::_parseCommandFrame()
     {
         if (payloadLength > 0) 
 		{
-            serialNumber = new String(payloadRxBytes);
+            memcpy(mSerialNumber, payloadRxBytes, payloadLength);
+			mSerialNumber[payloadLength] = '0';
             isSuccess = true;
         }
     } 
@@ -477,7 +481,8 @@ bool s3km1110::_parseCommandFrame()
     {
         if (payloadLength > 0) 
 		{
-            mFirmwareVersion = new String(payloadRxBytes);
+            memcpy(mFirmwareVersion, payloadRxBytes, payloadLength);
+			mFirmwareVersion[payloadLength] = '0';
             isSuccess = true;
         }
     }
