@@ -174,6 +174,10 @@ bool s3km1110::readAllRadarConfigs()
 
 #pragma mark - Private
 
+// collect up the rx stream. make a frame.
+// see if the frame is a data or command repsonse
+// call data or command rx processor as required.
+
 bool s3km1110::_read_frame()
 {
     if (!_uartRadar->available()) { return false; }
@@ -275,6 +279,10 @@ bool s3km1110::_isCommandFrameComplete()
         _radarDataFrame[_radarDataFramePosition - 1] == 0x01;
 }
 
+//--------------------------------------------------------------------
+// looks like only one type of data frame is processed and that is
+// the energy gate data.
+
 bool s3km1110::_parseDataFrame()
 {
     uint8_t frame_data_length = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
@@ -287,41 +295,54 @@ bool s3km1110::_parseDataFrame()
     }
     #endif
 
-    if (frame_data_length == 35) {
+    if (frame_data_length == 35) 
+	{
         uint8_t detectionResultRaw = _radarDataFrame[6];
         distanceToTarget = _radarDataFrame[7] + (_radarDataFrame[8] << 8);
         isTargetDetected = detectionResultRaw == 0x01;
 
         #ifdef S3KM1110_DEBUG_DATA
-        if (_uartDebug != nullptr) {
+        if (_uartDebug != nullptr)
+		{
             _uartDebug->printf("Detected: %x | Distance: %u\n", detectionResultRaw, distanceToTarget);
             _uartDebug->print(F("Gate energy:\n"));
-            for (uint8_t i = 0; i < S3KM1110_DISTANE_GATE_COUNT; i++) {
+
+            for (uint8_t i = 0; i < S3KM1110_DISTANCE_GATE_COUNT; i++) 
+			{
                 _uartDebug->printf("%02u\t", i);
             }
             _uartDebug->print('\n');
         }
         #endif
 
+		// convert data stream payload into array distanceGateEnergy
+		
         uint8_t distanceGateStart = 9;
-        for (uint8_t idx = 0; idx < S3KM1110_DISTANE_GATE_COUNT; idx++) {
+        for (uint8_t idx = 0; idx < S3KM1110_DISTANCE_GATE_COUNT; idx++) 
+		{
             uint16_t energy = _radarDataFrame[distanceGateStart + idx] + (_radarDataFrame[distanceGateStart + idx + 1] << 8);
             distanceGateEnergy[idx] = energy;
 
             #ifdef S3KM1110_DEBUG_DATA
-            if (_uartDebug != nullptr) {
+            if (_uartDebug != nullptr) 
+			{
                 _uartDebug->printf("%02u\t", distanceGateEnergy[idx]);
             }
             #endif
         }
+		
         #ifdef S3KM1110_DEBUG_DATA
-        if (_uartDebug != nullptr) {
+        if (_uartDebug != nullptr)
+		{
             _uartDebug->print('\n');
         }
         #endif
 
         return true;
-    } else {
+    }
+	else 
+    {
+    	// bad frame length
         #ifdef S3KM1110_DEBUG_DATA
         if (_uartDebug != nullptr) {
             _uartDebug->print(F("\nFrame length unexpected: "));
