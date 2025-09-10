@@ -2,6 +2,7 @@
 #define s3km1110_cpp
 
 #include "../include/s3km1110.h"
+#include "common.h"
 
 #define S3KM1110_FRAME_COMMAND_SIZE 2
 #define S3KM1110_FRAME_LENGTH_SIZE 2
@@ -30,7 +31,10 @@
 #define S3KM1110_RADAR_MODE_REPORT 0x04
 #define S3KM1110_RADAR_MODE_RUNNING 0x64
 
-s3km1110::s3km1110() : radarConfiguration(0) {};
+struct s3km1110ConfigParameters parkingLot;
+
+
+s3km1110::s3km1110() : radarConfiguration(&parkingLot) {};
 s3km1110::~s3km1110() = default;
 
 #pragma mark - Public
