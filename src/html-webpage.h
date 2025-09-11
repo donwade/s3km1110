@@ -663,7 +663,7 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
     // general processing code for the web page to ask for an XML steam
     // this is actually why you need to keep sending data to the page to 
     // force this call with stuff like this
-    // server.on("/xml", SendXML);
+    // server.on("/xml", UpdatePartsOfWebPage);
     // otherwise the page will not request XML from the ESP, and updates will not happen
     function process(){
      
