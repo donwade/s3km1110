@@ -1,3 +1,5 @@
+#if 0 // disable telnet for now
+
 /* ------------------------------------------------- */
 
 #include <Arduino.h>
@@ -85,7 +87,6 @@ void setupTelnet() {
 
 
 /* ------------------------------------------------- */
-
 void telnet_setup()
 {
     Serial.print("- Telnet: "); Serial.print(ip); Serial.print(":"); Serial.println(port);
@@ -93,7 +94,6 @@ void telnet_setup()
 }
 
 /* ------------------------------------------------- */
-
 void telnet_loop() {
   telnet.loop();
 
@@ -104,3 +104,13 @@ void telnet_loop() {
 }
 
 //* ------------------------------------------------- */
+#else
+void telnet_setup()
+{
+}
+void telnet_loop()
+{
+}
+#endif
+
+
