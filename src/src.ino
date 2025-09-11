@@ -2,6 +2,7 @@
 #include "common.h"
 #include "addin-ota.h"
 #include "telnet.h"
+#include "web-page.h"
 
 // give hardware serial a heads up we are not standard																		  
 #define RX2 18
@@ -11,8 +12,6 @@
 HardwareSerial customSerial(2);
 
 s3km1110 radar;
-
-uint32_t lastReading = 0;
 
 void setup(void) {
     Serial.begin(115200);
@@ -24,6 +23,7 @@ void setup(void) {
 
 	ota_setup();
 	telnet_setup();
+	web_setup();
 	
     bool isRadarEnabled = radar.begin(customSerial, Serial);
 	
@@ -39,18 +39,26 @@ void setup(void) {
 	Serial.printf("firmware : %s\n", radar.mFirmwareVersion);
 	Serial.printf("serno    : %s\n", radar.mSerialNumber);
 
-	delay(4000);
+	delay(1000);
 }
 
-void loop() {
-	
+static uint32_t lastReading = millis();
+
+void loop() 
+{
 	ota_loop();
 	telnet_loop();
-		
-    if (radar.isConnected()) {
-        lastReading = millis();
-        while (millis() - lastReading < 2000) {
-            if (radar.read()) {
+	web_loop();
+	
+    if (radar.isConnected()) 
+	{
+        if (millis() - lastReading > 200) 
+		{
+			TRACE("two\n");
+			lastReading = millis();
+            if (radar.read()) 
+			{
+				TRACE("three\n");
                 // Get radar info
                 bool isDetected = radar.bTargetDetected;		
                 int16_t targetDistance = radar.distanceToTarget;
@@ -70,5 +78,7 @@ void loop() {
             }
         }
     }
+//	else
+//		TRACE("no connect\n");
 	
 }
