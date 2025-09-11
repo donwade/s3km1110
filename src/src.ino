@@ -22,7 +22,7 @@ void setup(void) {
 	Serial.printf ("\033[2J\033[H\033[3J"); //putty clear screen and buffer
 
 	ota_setup();
-	telnet_setup();
+	//telnet_setup();
 	web_setup();
 	
     bool isRadarEnabled = radar.begin(customSerial, Serial);
@@ -47,18 +47,18 @@ static uint32_t lastReading = millis();
 void loop() 
 {
 	ota_loop();
-	telnet_loop();
+	//telnet_loop();
 	web_loop();
 	
     if (radar.isConnected()) 
 	{
-        if (millis() - lastReading > 200) 
+        lastReading = millis();
+
+		// read for a solid 2 seconds HARD loop
+        while (millis() - lastReading < 2000) 
 		{
-			TRACE("two\n");
-			lastReading = millis();
-            if (radar.read()) 
+            if (radar.read())
 			{
-				TRACE("three\n");
                 // Get radar info
                 bool isDetected = radar.bTargetDetected;		
                 int16_t targetDistance = radar.distanceToTarget;
