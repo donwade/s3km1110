@@ -1,0 +1,13 @@
+#define LOCAL_HOSTNAME "rover" 
+
+extern void setupLightSleepByTimer(uint32_t timeMs);
+extern void enterLightSleepTimer(void);
+
+//Options are: 240, 160, 120, 80, 40, 20 and 10 MHz
+const unsigned int CPU_FREQ = 80;  // can be 240 (default)
+const unsigned int CPU_SCALE=240/CPU_FREQ;
+
+extern void ota_setup(void);
+extern void ota_loop(void);
+
+

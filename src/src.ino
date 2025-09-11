@@ -1,6 +1,7 @@
 #include <../include/s3km1110.h>
 #include "common.h"
-
+#include "addin-ota.h"
+#include "telnet.h"
 
 // give hardware serial a heads up we are not standard																		  
 #define RX2 18
@@ -19,8 +20,12 @@ void setup(void) {
 	customSerial.setPins(RX2, TX2);  // runtime overide
     customSerial.begin(115200);
 
-    bool isRadarEnabled = radar.begin(customSerial, Serial);
 	Serial.printf ("\033[2J\033[H\033[3J"); //putty clear screen and buffer
+
+	ota_setup();
+	telnet_setup();
+	
+    bool isRadarEnabled = radar.begin(customSerial, Serial);
 	
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");
 
@@ -38,6 +43,10 @@ void setup(void) {
 }
 
 void loop() {
+	
+	ota_loop();
+	telnet_loop();
+		
     if (radar.isConnected()) {
         lastReading = millis();
         while (millis() - lastReading < 2000) {
