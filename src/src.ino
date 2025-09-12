@@ -29,6 +29,8 @@ void setup(void) {
 	
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");
 
+	radar.setRadarConfigurationMaximumGates(15);
+
     if (isRadarEnabled && radar.readAllRadarConfigs())
 	{
         auto config = radar.radarConfiguration;

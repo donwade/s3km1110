@@ -72,6 +72,10 @@ const char *cmd2String(int cmdNum)
 }
 //======================================================================
 
+// make global for easy web server access.
+uint16_t distanceGateEnergy[S3KM1110_DISTANCE_GATE_COUNT] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+
 s3km1110::s3km1110() : radarConfiguration(&parkingLot) {};
 s3km1110::~s3km1110() = default;
 
@@ -282,7 +286,9 @@ void s3km1110::_printCurrentFrame()
 {
     #if defined(S3KM1110_DEBUG_COMMANDS) || defined(S3KM1110_DEBUG_DATA)
     if (_uartDebug == nullptr) { return; }
-    for (uint8_t idx = 0; idx < _radarDataFramePosition; idx++) {
+
+    for (uint8_t idx = 0; idx < _radarDataFramePosition; idx++) 
+	{
         if (_radarDataFrame[idx] < 0x10) { _uartDebug->print('0'); }
         _uartDebug->print(_radarDataFrame[idx], HEX);
         _uartDebug->print(' ');
@@ -356,10 +362,13 @@ bool s3km1110::_parseDataFrame()
 
 		// convert data stream payload into array distanceGateEnergy
 		
-        uint8_t distanceGateStart = 9;
+        uint8_t distanceGateOffset = 9;
+		
         for (uint8_t idx = 0; idx < S3KM1110_DISTANCE_GATE_COUNT; idx++) 
 		{
-            uint16_t energy = _radarDataFrame[distanceGateStart + idx] + (_radarDataFrame[distanceGateStart + idx + 1] << 8);
+            uint16_t energy =    _radarDataFrame[distanceGateOffset + idx] 
+							  + (_radarDataFrame[distanceGateOffset + idx + 1] << 8);
+
             distanceGateEnergy[idx] = energy;
 
             #ifdef S3KM1110_DEBUG_DATA

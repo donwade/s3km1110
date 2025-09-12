@@ -10,6 +10,9 @@
 // #define S3KM1110_DEBUG_COMMANDS
 // #define S3KM1110_DEBUG_DATA
 
+
+extern uint16_t distanceGateEnergy[S3KM1110_DISTANCE_GATE_COUNT];
+
 struct s3km1110ConfigParameters
 {
     uint8_t detectionGatesMin;   // 0~15 | Minimum detection distance gate
@@ -52,7 +55,6 @@ class s3km1110 {
 
         bool bTargetDetected = false;
         int16_t distanceToTarget = -1;  // Distance to the target in centimetres.
-        uint16_t distanceGateEnergy[S3KM1110_DISTANCE_GATE_COUNT] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
     protected:
     private:

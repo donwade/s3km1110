@@ -101,7 +101,7 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
        padding: 3px 15px;
     }
     .tabledata {
-      font-size: 24px;
+      font-size: 10px;
       position: relative;
       padding-left: 5px;
       padding-top: 5px;
@@ -246,16 +246,48 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
       <table style="width:50%">
         <colgroup>
          //
-         <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
-         <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
-         <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
-         <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+
         </colgroup>
 
         <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
         <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
         <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
         <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+        <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
+
         <tr>
         <th colspan="1"><div class="heading">Topic</div></th>
         <th colspan="1"><div class="heading">Value1</div></th>
@@ -264,10 +296,24 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
         </tr>
 
         <tr>
-            <td><div class="bodytext">Radar pin 32</div></td>
+            <td><div class="bodytext">Energy</div></td>
             <td><div class="tabledata" id = "r1"></div></td>
             <td><div class="tabledata" id = "r2"></div></td>
-        </tr>
+            <td><div class="tabledata" id = "r3"</div></td>
+            <td><div class="tabledata" id = "r4"></div></td>
+            <td><div class="tabledata" id = "r5"></div></td>
+            <td><div class="tabledata" id = "r6"></div></td>
+            <td><div class="tabledata" id = "r7"></div></td>
+            <td><div class="tabledata" id = "r8"></div></td>
+            <td><div class="tabledata" id = "r9"></div></td>
+            <td><div class="tabledata" id = "r10"></div></td>
+            <td><div class="tabledata" id = "r11"></div></td>
+            <td><div class="tabledata" id = "r12"></div></td>
+            <td><div class="tabledata" id = "r13"></div></td>
+            <td><div class="tabledata" id = "r14"></div></td>
+            <td><div class="tabledata" id = "r15"></div></td>
+            <td><div class="tabledata" id = "r16"></div></td>
+         </tr>
 
         <tr>
             <td><div class="bodytext">USB LO/NOW/HI</div></td>
@@ -453,7 +499,7 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
         document.getElementById("time").innerHTML = dt.toLocaleTimeString();
         document.getElementById("date").innerHTML = dt.toLocaleDateString();
     
-        xmldoc = xmlResponse.getElementsByTagName("RADAR1");
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY1");
         message = xmldoc[0].firstChild.nodeValue;
         barwidth = message / 40.95;
         document.getElementById("r1").innerHTML=message;
@@ -463,18 +509,176 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
         // other wise uncomment and let the value dictate the color
         //document.getElementById("r1").style.backgroundColor=color;
         //document.getElementById("r1").style.borderRadius="5px";
+        // --------
 
-        //-----------------------------------------------
-        
-        xmldoc = xmlResponse.getElementsByTagName("RADAR2");
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY2");
         message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
         document.getElementById("r2").innerHTML=message;
         document.getElementById("r2").style.width=(barwidth+"%");
-        // you can set color dynamically, maybe blue below a value, red above
-        document.getElementById("r2").style.backgroundColor=color;
-        //document.getElementById("r2").style.borderRadius="5px";
 
-        //-----------------------------------------------
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r2").style.backgroundColor=color;
+        //document.getElementById("r2").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY3");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r3").innerHTML=message;
+        document.getElementById("r3").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r3").style.backgroundColor=color;
+        //document.getElementById("r3").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY4");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r4").innerHTML=message;
+        document.getElementById("r4").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r4").style.backgroundColor=color;
+        //document.getElementById("r4").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY5");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r5").innerHTML=message;
+        document.getElementById("r5").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r5").style.backgroundColor=color;
+        //document.getElementById("r5").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY6");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r6").innerHTML=message;
+        document.getElementById("r6").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r6").style.backgroundColor=color;
+        //document.getElementById("r6").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY7");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r7").innerHTML=message;
+        document.getElementById("r7").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r7").style.backgroundColor=color;
+        //document.getElementById("r7").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY8");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r8").innerHTML=message;
+        document.getElementById("r8").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r8").style.backgroundColor=color;
+        //document.getElementById("r8").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY9");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r9").innerHTML=message;
+        document.getElementById("r9").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r9").style.backgroundColor=color;
+        //document.getElementById("r9").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY10");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r10").innerHTML=message;
+        document.getElementById("r10").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r10").style.backgroundColor=color;
+        //document.getElementById("r10").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY11");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r11").innerHTML=message;
+        document.getElementById("r11").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r11").style.backgroundColor=color;
+        //document.getElementById("r11").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY13");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r13").innerHTML=message;
+        document.getElementById("r13").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r13").style.backgroundColor=color;
+        //document.getElementById("r13").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY14");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r14").innerHTML=message;
+        document.getElementById("r14").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r14").style.backgroundColor=color;
+        //document.getElementById("r14").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY15");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r15").innerHTML=message;
+        document.getElementById("r15").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r15").style.backgroundColor=color;
+        //document.getElementById("r15").style.borderRadius="5px";
+        // --------
+
+        xmldoc = xmlResponse.getElementsByTagName("ENERGY16");
+        message = xmldoc[0].firstChild.nodeValue;
+        barwidth = message / 40.95;
+        document.getElementById("r16").innerHTML=message;
+        document.getElementById("r16").style.width=(barwidth+"%");
+
+        // if you want to use global color set above in <style> section
+        // other wise uncomment and let the value dictate the color
+        //document.getElementById("r16").style.backgroundColor=color;
+        //document.getElementById("r16").style.borderRadius="5px";
+        // --------
+//-----------------------------------------------
 
         xmldoc = xmlResponse.getElementsByTagName("USBVOLTAGE1");
         message = xmldoc[0].firstChild.nodeValue;

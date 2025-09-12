@@ -168,6 +168,8 @@ void SendFullWebpage() {
 // for phsyical position in a 'excel' formatted table. That has
 // nothing to do with tags.
 
+#include "../include/s3km1110.h"
+
 void UpdatePartsOfWebPage() 
 {
 
@@ -187,15 +189,15 @@ void UpdatePartsOfWebPage()
   last_time = millis();
   
   //------------------------
-
+  int i;
   strcpy(XML, "<?xml version = '1.0'?>\n<Data>\n");
 
-  sprintf(xml_tbuf, "<RADAR1>%d</RADAR1>\n", 1);
-  strcat(XML, xml_tbuf);
+  for (i = 0; i < S3KM1110_DISTANCE_GATE_COUNT; i++)
+  {
+  	sprintf(xml_tbuf, "<ENERGY%d>%d</ENERGY%d>\n", i+1, distanceGateEnergy[i], i+1);
+  	strcat(XML, xml_tbuf);
+  }
   
-  sprintf(xml_tbuf, "<RADAR2>%d</RADAR2>\n", (int) (2));
-  strcat(XML, xml_tbuf);
-
   // send USB voltage
   sprintf(xml_tbuf, "<USBVOLTAGE1>%5.2fv</USBVOLTAGE1>\n", 1.1);
   strcat(XML, xml_tbuf);
