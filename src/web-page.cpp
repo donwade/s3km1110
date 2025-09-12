@@ -197,7 +197,7 @@ void UpdatePartsOfWebPage()
   	sprintf(xml_tbuf, "<ENERGY%d>%5d</ENERGY%d>\n", i+1, distanceGateEnergy[i], i+1);
   	strcat(XML, xml_tbuf);
   }
-  
+#if 0  
   // send USB voltage
   sprintf(xml_tbuf, "<USBVOLTAGE1>%5.2fv</USBVOLTAGE1>\n", 1.1);
   strcat(XML, xml_tbuf);
@@ -250,7 +250,7 @@ void UpdatePartsOfWebPage()
 
   sprintf(xml_tbuf, "<REBOOTS3>%d</REBOOTS3>\n", val);
   strcat(XML, xml_tbuf);
-
+#endif
 
   // show led0 status
   if (LED0) {
@@ -273,7 +273,7 @@ void UpdatePartsOfWebPage()
   // actually print it to the serial monitor and use some text editor to get the size
   // then pad and adjust char XML[2048]; above
 
-  #if 0 // dwade no print xml
+  #if 1 // dwade no print xml
   Serial.println(XML);
   #endif
   

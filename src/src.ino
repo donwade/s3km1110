@@ -52,7 +52,6 @@ void loop()
 {
 	ota_loop();
 	//telnet_loop();
-	web_loop();
 	
     if (radar.isConnected()) 
 	{
@@ -63,6 +62,9 @@ void loop()
 		{
             if (radar.read())
 			{
+				// update web only when info available.
+				web_loop();
+
                 // Get radar info
                 bool isDetected = radar.bTargetDetected;		
                 int16_t targetDistance = radar.distanceToTarget;
