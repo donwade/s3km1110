@@ -3,6 +3,8 @@
 #include "addin-ota.h"
 #include "telnet.h"
 #include "web-page.h"
+#include "../include/s3km1110.h"
+
 
 // give hardware serial a heads up we are not standard																		  
 #define RX2 18

@@ -101,16 +101,17 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
        padding: 3px 15px;
     }
     .tabledata {
-      font-size: 10px;
+      font-size: 10px;    //table font size
       position: relative;
       padding-left: 5px;
       padding-top: 5px;
       height:   25px;
       border-radius: 5px;
-      color: #FFFFFF;
-      line-height: 20px;
-      transition: all 200ms ease-in-out;
-      background-color: #000000;
+      color: #FFFF00;       // text font color
+      line-height: 16px;
+
+      //transition: all 200ms ease-in-out;  //disable progress bar
+      //background-color: #0000FF;  //progress bar colour
     }
     .backlightSlider {
       width: 30%;
@@ -246,24 +247,24 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
       <table style="width:50%">
         <colgroup>
          //
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
             <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
-            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
-
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
-            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
             <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
 
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
             <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
             <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
 
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
             <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
-            <col span="1" style="background-color:rgb(30,30,30); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
+            <col span="1" style="background-color:rgb(50,10,10); width: 30%; color:#000000 ;">
             <col span="1" style="background-color:rgb(80,80,80); width: 30%; color:#000000 ;">
 
         </colgroup>
@@ -288,11 +289,29 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
         <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
         <col span="2"style="background-color:rgb(0,0,0); color:#FFFFFF">
 
+
         <tr>
-        <th colspan="1"><div class="heading">Topic</div></th>
-        <th colspan="1"><div class="heading">Value1</div></th>
-        <th colspan="1"><div class="heading">Value2</div></th>
-        <th colspan="1"><div class="heading">Value3</div></th>
+            <th colspan="1"><div class="heading">BIN #</div></th>
+            <th colspan="1"><div class="heading">  1</div></th>
+            <th colspan="1"><div class="heading">  2</div></th>
+            <th colspan="1"><div class="heading">  3</div></th>
+            <th colspan="1"><div class="heading">  4</div></th>
+
+            <th colspan="1"><div class="heading">  5</div></th>
+            <th colspan="1"><div class="heading">  6</div></th>
+            <th colspan="1"><div class="heading">  7</div></th>
+            <th colspan="1"><div class="heading">  8</div></th>
+
+            <th colspan="1"><div class="heading">  9</div></th>
+            <th colspan="1"><div class="heading"> 10</div></th>
+            <th colspan="1"><div class="heading"> 11</div></th>
+            <th colspan="1"><div class="heading"> 12</div></th>
+
+            <th colspan="1"><div class="heading"> 13</div></th>
+            <th colspan="1"><div class="heading"> 14</div></th>
+            <th colspan="1"><div class="heading"> 15</div></th>
+            <th colspan="1"><div class="heading"> 16</div></th>
+
         </tr>
 
         <tr>

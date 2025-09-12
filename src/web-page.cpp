@@ -194,7 +194,7 @@ void UpdatePartsOfWebPage()
 
   for (i = 0; i < S3KM1110_DISTANCE_GATE_COUNT; i++)
   {
-  	sprintf(xml_tbuf, "<ENERGY%d>%d</ENERGY%d>\n", i+1, distanceGateEnergy[i], i+1);
+  	sprintf(xml_tbuf, "<ENERGY%d>%5d</ENERGY%d>\n", i+1, distanceGateEnergy[i], i+1);
   	strcat(XML, xml_tbuf);
   }
   
