@@ -31,8 +31,6 @@ void setup(void) {
 	
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");
 
-	radar.setRadarConfigurationMaximumGates(15);
-
     if (isRadarEnabled && radar.readAllRadarConfigs())
 	{
         auto config = radar.radarConfiguration;
@@ -40,16 +38,25 @@ void setup(void) {
                     config->detectionGatesMin, config->detectionGatesMax, config->activeFrameNum, config->inactiveFrameNum, config->disappearDelay);
     }
 
+
 	Serial.printf("firmware : %s\n", radar.mFirmwareVersion);
 	Serial.printf("serno    : %s\n", radar.mSerialNumber);
 
+	// start chatter?
+	radar.setRadarConfigurationMaximumGates(15);
+
+	Serial.printf("\nSetup complete ------------------------\n\n");
 	delay(1000);
+
+	
+	radar._enableReportMode(); //!!! moved out of radio.begin()
 }
 
 static uint32_t lastReading = millis();
 
 void loop() 
 {
+
 	ota_loop();
 	//telnet_loop();
 	

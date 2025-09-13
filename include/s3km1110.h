@@ -48,6 +48,8 @@ class s3km1110 {
         bool setRadarConfigurationInactiveFrameNum(uint8_t);
         bool setRadarConfigurationDelay(uint16_t);
 
+        bool _enableReportMode();
+
         char  mFirmwareVersion[30];
         char  mSerialNumber[30];
 
@@ -75,7 +77,6 @@ class s3km1110 {
         uint8_t commandRequested = 0;
         bool mbLastRxCmdValid = false;
 
-        bool _enableReportMode();
         void _printCurrentFrame();
 
         bool _read_frame();

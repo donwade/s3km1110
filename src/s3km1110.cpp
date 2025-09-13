@@ -96,7 +96,7 @@ bool s3km1110::begin(Stream &dataStream, Stream &debugStream)
         return false;
     }
 
-    return _enableReportMode();
+    return true;
 }
 
 bool s3km1110::isConnected()
@@ -120,7 +120,9 @@ bool s3km1110::_enableReportMode()
 
 bool s3km1110::readFirmwareVersion()
 {
-    return _sendCommandAndWait(COMMAND_READ_FIRMWARE_VERSION, 0, 0);
+	TRACE("read firmware");
+    bool foo = _sendCommandAndWait(COMMAND_READ_FIRMWARE_VERSION, 0, 0);
+	return foo;
 }
 
 bool s3km1110::readSerialNumber()
@@ -205,12 +207,12 @@ bool s3km1110::readRadarConfigDelay()
 bool s3km1110::readAllRadarConfigs()
 {
     return
+        readFirmwareVersion() &&
+        readSerialNumber() &&
         readRadarConfigMinimumGates() &&
         readRadarConfigMaximumGates() &&
         readRadarConfigActiveFrameNumber() &&
         readRadarConfigInactiveFrameNumber() &&
-        readFirmwareVersion() &&
-        readSerialNumber();
         readRadarConfigDelay();
 }
 
@@ -288,10 +290,14 @@ void s3km1110::_printCurrentFrame()
     if (_uartDebug == nullptr) { return; }
 
     for (uint8_t idx = 0; idx < _radarDataFramePosition; idx++) 
-	{
-        if (_radarDataFrame[idx] < 0x10) { _uartDebug->print('0'); }
-        _uartDebug->print(_radarDataFrame[idx], HEX);
-        _uartDebug->print(' ');
+    {
+		if (idx == 4 || 
+			idx == 6 || 
+			idx == 8 || 
+			idx == 10|| 
+			idx == 12|| 
+			idx == _radarDataFramePosition - 4) _uartDebug->print(" - ");
+        _uartDebug->printf("%02X ", _radarDataFrame[idx]);
     }
     _uartDebug->println(' ');
     #endif
@@ -336,6 +342,8 @@ bool s3km1110::_parseDataFrame()
         _uartDebug->println(F("----------------------------------------"));
         _uartDebug->print(F("RCV DTA: "));
         _printCurrentFrame();
+		
+	
     }
     #endif
 
@@ -415,7 +423,10 @@ bool s3km1110::_parseCommandFrame()
     uint8_t totalFrameSize = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
 
     mlastRxCommand = _radarDataFrame[6];
-    mbLastRxCmdValid = (_radarDataFrame[8] == 0x00 && _radarDataFrame[9] == 0x00);
+
+	// 8 9 indicates valid.
+    mbLastRxCmdValid = (   _radarDataFrame[8] == 0x00 
+						&& _radarDataFrame[9] == 0x00);
 
     bool bRxPayloadHasSize = false;
 	
@@ -593,16 +604,26 @@ bool s3km1110::_closeCommandMode()
 
 void s3km1110::_sendHexData(String rawData)
 {
+    unsigned int count = rawData.length();
+    byte bytes[count / 2];
+
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
         _uartDebug->println(F("-------------------------------------------"));
-        _uartDebug->print(F("SND: "));
-        _uartDebug->println(rawData);
+        _uartDebug->print(F("SND DTA: "));
+
+		for (byte idx = 0; idx < count; idx += 2) 
+		{
+			if (idx == 8 || idx == 12 || idx == count -8) 
+				_uartDebug->print(" - ");
+			//_uartDebug->println(strtoul(rawData.substring(idx, idx + 2).c_str(), NULL, HEX));
+			_uartDebug->printf("%02X ", strtoul(rawData.substring(idx, idx + 2).c_str(), NULL, HEX));
+		}
+		_uartDebug->println();
+		
     }
     #endif
 
-    unsigned int count = rawData.length();
-    byte bytes[count / 2];
     for (byte idx = 0; idx < count; idx += 2) {
         bytes[idx / 2] = strtoul(rawData.substring(idx, idx + 2).c_str(), NULL, HEX);
     }
