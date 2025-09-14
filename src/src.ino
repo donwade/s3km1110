@@ -15,6 +15,8 @@ HardwareSerial customSerial(2);
 
 s3km1110 radar;
 
+#define SETUP_ONLY  // no stream
+
 void setup(void) {
     Serial.begin(115200);
 
@@ -48,50 +50,62 @@ void setup(void) {
 	Serial.printf("\nSetup complete ------------------------\n\n");
 	delay(1000);
 
+
+	#ifndef SETUP_ONLY	
+		radar._enableReportMode(); //!!! moved out of radio.begin()
+	#else
+		Serial.printf("reporting mode disabled... setup only... no data streamning\n");
+		Serial.printf("reporting mode disabled... setup only... no data streamning\n");
+		Serial.printf("reporting mode disabled... setup only... no data streamning\n");
+		Serial.printf("reporting mode disabled... setup only... no data streamning\n");
+	#endif
 	
-	radar._enableReportMode(); //!!! moved out of radio.begin()
 }
 
 static uint32_t lastReading = millis();
 
 void loop() 
 {
-
 	ota_loop();
-	//telnet_loop();
-	
-    if (radar.isConnected()) 
-	{
-        lastReading = millis();
 
-		// read for a solid 2 seconds HARD loop
-        while (millis() - lastReading < 2000) 
+	#ifndef SETUP_ONLY
+		
+		//telnet_loop();
+		
+	    if (radar.isConnected()) 
 		{
-            if (radar.read())
+	        lastReading = millis();
+
+			// read for a solid 2 seconds HARD loop
+	        while (millis() - lastReading < 2000) 
 			{
-				// update web only when info available.
-				web_loop();
+	            if (radar.read())
+				{
+					// update web only when info available.
+					web_loop();
 
-                // Get radar info
-                bool isDetected = radar.bTargetDetected;		
-                int16_t targetDistance = radar.distanceToTarget;
+	                // Get radar info
+	                bool isDetected = radar.bTargetDetected;		
+	                int16_t targetDistance = radar.distanceToTarget;
 
-				uint16_t auxDistanceCm = targetDistance;
-				uint16_t inches = (float) auxDistanceCm / 2.54;
-				uint16_t feet = inches/12;
-				uint16_t in = inches - feet * 12;
-				TRACE("detected = %s distance =%d cm %d in\n", 
-						isDetected?"YES": "NO", 
-						targetDistance,
-						inches);
-				
-				TRACE("detected = %s distance =%d ft %d in\n", 
-						isDetected?"YES": "NO", 
-						feet, in);
-            }
-        }
-    }
-//	else
-//		TRACE("no connect\n");
-	
+					uint16_t auxDistanceCm = targetDistance;
+					uint16_t inches = (float) auxDistanceCm / 2.54;
+					uint16_t feet = inches/12;
+					uint16_t in = inches - feet * 12;
+					TRACE("detected = %s distance =%d cm %d in\n", 
+							isDetected?"YES": "NO", 
+							targetDistance,
+							inches);
+					
+					TRACE("detected = %s distance =%d ft %d in\n", 
+							isDetected?"YES": "NO", 
+							feet, in);
+	            }
+	        }
+	    }
+	//	else
+	//		TRACE("no connect\n");
+	#else
+		delay(100);
+	#endif
 }
