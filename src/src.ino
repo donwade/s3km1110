@@ -15,7 +15,7 @@ HardwareSerial customSerial(2);
 
 s3km1110 radar;
 
-#define SETUP_ONLY  // no stream
+//#define SETUP_ONLY  // no stream
 
 void setup(void) {
     Serial.begin(115200);

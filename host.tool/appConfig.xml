@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <AppConfig
 	LANGUAGE="ENG"
-	BaudRate="115200">
+	BaudRate="115200"
+	RadarConfigFile="RadarParamConfig.xml">
 	<ParamSetting
 		GateMax="12"
 		ObjectDisappearDelayTime="30"
