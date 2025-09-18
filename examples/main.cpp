@@ -65,6 +65,7 @@ void setup(void)
     if (isRadarEnabled) 
     {
     	radar.setRadarConfigurationDelay(2);
+    	radar.setRadarConfigurationMaximumGates(15);
 		radar.setRadarConfigurationActiveFrameNum(15); //all frames    	
         if (radar.readAllRadarConfigs()) {
             auto config = radar.radarConfiguration;
