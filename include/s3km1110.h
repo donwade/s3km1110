@@ -55,6 +55,11 @@ class s3km1110 {
         int16_t distanceToTarget = -1;  // Distance to the target in centimetres.
         uint16_t distanceGateEnergy[S3KM1110_DISTANE_GATE_COUNT] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+        bool _enableReportMode();
+        bool _enableDebugMode();
+        bool _enableNormalMode();
+    
+
     protected:
     private:
         Stream *_uartRadar = nullptr;
@@ -74,12 +79,13 @@ class s3km1110 {
         uint8_t _lastRadarConfigCommand = 0;
         bool _isLatestCommandSuccess = false;
 
-        bool _enableReportMode();
         void _printCurrentFrame();
 
         bool _read_frame();
         bool _isDataFrameComplete();
         bool _isCommandFrameComplete();
+        bool _isDebugFrameComplete();
+
 		bool _parseDataFrame();
 		bool _parseCommandFrame();
         bool _parseGetConfigCommandFrame(char*, uint8_t);

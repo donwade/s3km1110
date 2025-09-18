@@ -28,7 +28,7 @@
 
 #define S3KM1110_RADAR_MODE_DEBUG 0x00
 #define S3KM1110_RADAR_MODE_REPORT 0x04
-#define S3KM1110_RADAR_MODE_RUNNING 0x64
+#define S3KM1110_RADAR_MODE_NORMAL 0x64
 
 s3km1110::s3km1110() {};  //: radarConfiguration(new ) {};
 s3km1110::~s3km1110() = default;
@@ -50,7 +50,7 @@ bool s3km1110::begin(Stream &dataStream, Stream &debugStream)
         return false;
     }
 
-    return _enableReportMode();
+    return true;
 }
 
 bool s3km1110::isConnected()
@@ -71,6 +71,18 @@ bool s3km1110::_enableReportMode()
 {
     return _sendCommandAndWait(S3KM1110_RADAR_COMMAND_SET_MODE, 0, 2, S3KM1110_RADAR_MODE_REPORT, 4);
 }
+
+bool s3km1110::_enableDebugMode() 
+{
+    return _sendCommandAndWait(S3KM1110_RADAR_COMMAND_SET_MODE, 0, 2, S3KM1110_RADAR_MODE_DEBUG, 4);
+}
+
+bool s3km1110::_enableNormalMode() 
+{
+    return _sendCommandAndWait(S3KM1110_RADAR_COMMAND_SET_MODE, 0, 2, S3KM1110_RADAR_MODE_NORMAL, 4);
+}
+
+
 
 bool s3km1110::readFirmwareVersion()
 {
@@ -209,12 +221,16 @@ bool s3km1110::_read_frame()
         } else {
             _radarDataFrame[_radarDataFramePosition++] = _readData;
 
-            if (_radarDataFramePosition >= 8) {
-                if (_isDataFrameComplete()) {
+            if (_radarDataFramePosition >= 8) 
+            {
+                if (_isDataFrameComplete()) 
+                {
                     isSuccess = _parseDataFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
-                } else if (_isCommandFrameComplete()) {
+                } 
+                else if (_isCommandFrameComplete())
+                {
                     isSuccess = _parseCommandFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
@@ -239,26 +255,43 @@ void s3km1110::_printCurrentFrame()
     #endif
 }
 
-bool s3km1110::_isDataFrameComplete()
+bool s3km1110::_isDataFrameComplete()  // report mode
 {
+	// check the pre-sync and post-sync packet patterns.
     return 
-        _radarDataFrame[0]                              == 0xF4 &&
-        _radarDataFrame[1]                              == 0xF3 &&
-        _radarDataFrame[2]                              == 0xF2 &&
-        _radarDataFrame[3]                              == 0xF1 &&
+        _radarDataFrame[0] == 0xF4 &&
+        _radarDataFrame[1] == 0xF3 &&
+        _radarDataFrame[2] == 0xF2 &&
+        _radarDataFrame[3] == 0xF1 &&
         _radarDataFrame[_radarDataFramePosition - 4] == 0xF8 &&
         _radarDataFrame[_radarDataFramePosition - 3] == 0xF7 &&
         _radarDataFrame[_radarDataFramePosition - 2] == 0xF6 &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0xF5;
 }
 
-bool s3km1110::_isCommandFrameComplete()
+bool s3km1110::_isDebugFrameComplete()  // report mode
 {
+	// check the pre-sync and post-sync packet patterns.
+    return 
+        _radarDataFrame[0] == 0xAA &&
+        _radarDataFrame[1] == 0xBF &&
+        _radarDataFrame[2] == 0x10 &&
+        _radarDataFrame[3] == 0x14 &&
+        _radarDataFrame[_radarDataFramePosition - 4] == 0xFD &&
+        _radarDataFrame[_radarDataFramePosition - 3] == 0xFC &&
+        _radarDataFrame[_radarDataFramePosition - 2] == 0xFB &&
+        _radarDataFrame[_radarDataFramePosition - 1] == 0xFA;
+}
+
+
+bool s3km1110::_isCommandFrameComplete() // command formats
+{
+	// check the pre-sync and post-sync packet patterns.
     return
-        _radarDataFrame[0]                              == 0xFD &&
-		_radarDataFrame[1]                              == 0xFC &&
-		_radarDataFrame[2]                              == 0xFB &&
-		_radarDataFrame[3]                              == 0xFA &&
+        _radarDataFrame[0] == 0xFD &&
+		_radarDataFrame[1] == 0xFC &&
+		_radarDataFrame[2] == 0xFB &&
+		_radarDataFrame[3] == 0xFA &&
         _radarDataFrame[_radarDataFramePosition - 4] == 0x04 &&
         _radarDataFrame[_radarDataFramePosition - 3] == 0x03 &&
         _radarDataFrame[_radarDataFramePosition - 2] == 0x02 &&
