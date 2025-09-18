@@ -74,12 +74,13 @@ class s3km1110 {
 
         bool _isFrameStarted = false;
         bool _isCommandFrame = false;
+        bool _isDebugFrame = false;
 
         uint8_t _lastCommand = 0;
         uint8_t _lastRadarConfigCommand = 0;
         bool _isLatestCommandSuccess = false;
 
-        void _printCurrentFrame();
+        void _printCurrentFrame(const char *msg);
 
         bool _read_frame();
         bool _isDataFrameComplete();
@@ -88,6 +89,7 @@ class s3km1110 {
 
 		bool _parseDataFrame();
 		bool _parseCommandFrame();
+		bool _parseDebugFrame();
         bool _parseGetConfigCommandFrame(char*, uint8_t);
 
         void _sendHexData(String);
