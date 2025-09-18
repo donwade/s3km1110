@@ -45,8 +45,6 @@ bool isDetected = false;
 
 #pragma mark - Lyfe cycle
 
-s3km1110ConfigParameters foo;
-
 #define PIN_LED 2
 
 void setup(void)
@@ -61,15 +59,13 @@ void setup(void)
 	pinMode(PIN_LED, OUTPUT);
 	digitalWrite(PIN_LED, 0);
 
-	radar.radarConfiguration = foo;
-	
     bool isRadarEnabled = radar.begin(RADAR_SERIAL, MONITOR_SERIAL);
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");  
 
     if (isRadarEnabled) 
     {
     	radar.setRadarConfigurationDelay(2);
-    	
+		radar.setRadarConfigurationActiveFrameNum(15); //all frames    	
         if (radar.readAllRadarConfigs()) {
             auto config = radar.radarConfiguration;
             MONITOR_SERIAL.printf("[Info] Radar config:\n |- Gates  | Min: %u\t| Max: %u\n |- Frames | Detect: %u\t| Disappear: %u\n |- Disappearance delay: %u\n",
@@ -89,15 +85,15 @@ void loop(void)
                 uint16_t newDistance = radar.distanceToTarget;
 
                 if (isDetected && !newIsDetected) {
-                	uint16_t inches;
+                	float inches;
                 	uint16_t feet;
                 	uint16_t in;
                 	
                 	inches = (float)lastDistance / 2.54;
-                	feet = inches / 12;
+                	feet = (uint16_t) inches / 12;
                 	in = inches - 12 * feet;
                 	
-                    MONITOR_SERIAL.printf("[INFO] Target lost on: %3ucm\t %3u\"\t %3u\'-%02u\"\n", 
+                    MONITOR_SERIAL.printf("[INFO] Target lost on:     %3ucm\t%4.2f\"\t %3u\'-%02u\"\n", 
                     						lastDistance,
                     						inches,
                     						feet, in);
@@ -112,14 +108,14 @@ void loop(void)
 
                 if (lastDistance != newDistance) 
                 {
-                	uint16_t inches;
+                	float inches;
                 	uint16_t feet;
                 	uint16_t in;
                 	inches = (float)newDistance / 2.54;
-                	feet = inches / 12;
+                	feet = (uint16_t) inches / 12;
                 	in = inches - 12 * feet;
                 	
-                    MONITOR_SERIAL.printf("[INFO] Distance to target: %3ucm\t %3u\"\t %3u\'-%02u\"\n", 
+                    MONITOR_SERIAL.printf("[INFO] Distance to target: %3ucm\t%3.2f\"\t %3u\'-%02u\"\n", 
                     						newDistance,
                     						inches,
                     						feet, in);
