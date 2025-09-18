@@ -47,6 +47,7 @@ bool isDetected = false;
 
 s3km1110ConfigParameters foo;
 
+#define PIN_LED 2
 
 void setup(void)
 {
@@ -57,18 +58,25 @@ void setup(void)
     RADAR_SERIAL.begin(115200); //UART for monitoring the radar
     #endif
 
+	pinMode(PIN_LED, OUTPUT);
+	digitalWrite(PIN_LED, 0);
+
 	radar.radarConfiguration = foo;
 	
     bool isRadarEnabled = radar.begin(RADAR_SERIAL, MONITOR_SERIAL);
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");  
 
-    if (isRadarEnabled) {
+    if (isRadarEnabled) 
+    {
+    	radar.setRadarConfigurationDelay(2);
+    	
         if (radar.readAllRadarConfigs()) {
             auto config = radar.radarConfiguration;
             MONITOR_SERIAL.printf("[Info] Radar config:\n |- Gates  | Min: %u\t| Max: %u\n |- Frames | Detect: %u\t| Disappear: %u\n |- Disappearance delay: %u\n",
                                 config.detectionGatesMin, config.detectionGatesMax, config.activeFrameNum, config.inactiveFrameNum, config.delay);
         }
     }
+    
 }
 
 void loop(void)
@@ -81,16 +89,41 @@ void loop(void)
                 uint16_t newDistance = radar.distanceToTarget;
 
                 if (isDetected && !newIsDetected) {
-                    MONITOR_SERIAL.printf("[INFO] Target lost on %ucm\n", lastDistance);
+                	uint16_t inches;
+                	uint16_t feet;
+                	uint16_t in;
+                	
+                	inches = (float)lastDistance / 2.54;
+                	feet = inches / 12;
+                	in = inches - 12 * feet;
+                	
+                    MONITOR_SERIAL.printf("[INFO] Target lost on: %3ucm\t %3u\"\t %3u\'-%02u\"\n", 
+                    						lastDistance,
+                    						inches,
+                    						feet, in);
                     isDetected = newIsDetected;
                     lastDistance = newDistance;
+                    
+					digitalWrite(PIN_LED, 0);
                     return;
                 }
 
                 isDetected = newIsDetected;
 
-                if (lastDistance != newDistance) {
-                    MONITOR_SERIAL.printf("[INFO] Distance for target: %ucm\n", newDistance);
+                if (lastDistance != newDistance) 
+                {
+                	uint16_t inches;
+                	uint16_t feet;
+                	uint16_t in;
+                	inches = (float)newDistance / 2.54;
+                	feet = inches / 12;
+                	in = inches - 12 * feet;
+                	
+                    MONITOR_SERIAL.printf("[INFO] Distance to target: %3ucm\t %3u\"\t %3u\'-%02u\"\n", 
+                    						newDistance,
+                    						inches,
+                    						feet, in);
+					digitalWrite(PIN_LED, 1);
                 }
 
                 lastDistance = newDistance;
