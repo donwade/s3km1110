@@ -62,8 +62,7 @@ void setup(void)
     bool isRadarEnabled = radar.begin(RADAR_SERIAL, MONITOR_SERIAL);
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");  
     
-    radar._enableReportMode();
-    
+    radar._enableReportMode();  //SOP :)
     //radar._enableDebugMode();
     //radar._enableNormalMode();
 
