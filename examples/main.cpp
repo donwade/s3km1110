@@ -1,13 +1,16 @@
 #include <Arduino.h>
 #include <s3km1110.h>
+#include <HardwareSerial.h>
+
+HardwareSerial S3km11110(2);
 
 #if defined(ESP32)
   #ifdef ESP_IDF_VERSION_MAJOR // IDF 4+
     #if CONFIG_IDF_TARGET_ESP32 // ESP32/PICO-D4
       #define MONITOR_SERIAL Serial
-      #define RADAR_SERIAL Serial2
-      #define RADAR_RX_PIN 16
-      #define RADAR_TX_PIN 17
+      #define RADAR_SERIAL S3km11110
+      #define RADAR_RX_PIN 18
+      #define RADAR_TX_PIN 19
     #elif CONFIG_IDF_TARGET_ESP32S2
       #define MONITOR_SERIAL Serial
       #define RADAR_SERIAL Serial1
@@ -42,6 +45,9 @@ bool isDetected = false;
 
 #pragma mark - Lyfe cycle
 
+s3km1110ConfigParameters foo;
+
+
 void setup(void)
 {
     MONITOR_SERIAL.begin(115200);
@@ -51,6 +57,8 @@ void setup(void)
     RADAR_SERIAL.begin(115200); //UART for monitoring the radar
     #endif
 
+	radar.radarConfiguration = foo;
+	
     bool isRadarEnabled = radar.begin(RADAR_SERIAL, MONITOR_SERIAL);
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");  
 
@@ -58,7 +66,7 @@ void setup(void)
         if (radar.readAllRadarConfigs()) {
             auto config = radar.radarConfiguration;
             MONITOR_SERIAL.printf("[Info] Radar config:\n |- Gates  | Min: %u\t| Max: %u\n |- Frames | Detect: %u\t| Disappear: %u\n |- Disappearance delay: %u\n",
-                                config->detectionGatesMin, config->detectionGatesMax, config->activeFrameNum, config->inactiveFrameNum, config->delay);
+                                config.detectionGatesMin, config.detectionGatesMax, config.activeFrameNum, config.inactiveFrameNum, config.delay);
         }
     }
 }

@@ -12,12 +12,13 @@
 
 struct s3km1110ConfigParameters
 {
-    uint8_t *detectionGatesMin = nullptr;   // 0~15 | Minimum detection distance gate
-    uint8_t *detectionGatesMax = nullptr;   // 0~15 | Maximum detection distance gate
-    uint8_t *activeFrameNum = nullptr;      // Minimum frame number of detected target
-    uint8_t *inactiveFrameNum = nullptr;    // Minimum number of frames when the target disappears 
-    uint16_t *delay = nullptr;              // 0~65535 | Target disappearance delay time (sec)
+    uint8_t detectionGatesMin = 0;   // 0~15 | Minimum detection distance gate
+    uint8_t detectionGatesMax = 0;   // 0~15 | Maximum detection distance gate
+    uint8_t activeFrameNum = 0;      // Minimum frame number of detected target
+    uint8_t inactiveFrameNum = 0;    // Minimum number of frames when the target disappears 
+    uint16_t delay = 0;              // 0~65535 | Target disappearance delay time (sec)
 };
+
 
 class s3km1110 {
 
@@ -48,7 +49,7 @@ class s3km1110 {
         String *firmwareVersion = nullptr;
         String *serialNumber = nullptr;
 
-        s3km1110ConfigParameters *radarConfiguration;
+        s3km1110ConfigParameters radarConfiguration;
 
         bool isTargetDetected = false;
         int16_t distanceToTarget = -1;  // Distance to the target in centimetres.
