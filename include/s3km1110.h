@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-#define S3KM1110_MAX_FRAME_LENGTH 45
+#define S3KM1110_MAX_FRAME_LENGTH 180
 #define S3KM1110_DISTANE_GATE_COUNT 16
 
 // #define S3KM1110_DEBUG_COMMANDS
@@ -69,7 +69,7 @@ class s3km1110 {
         uint32_t _radarUartLastPacketTime = 0;
         uint32_t _radarUartLastCommandTime = 0;
 
-        uint8_t _radarDataFrame[S3KM1110_MAX_FRAME_LENGTH];
+        uint8_t _radarDataFrame[S3KM1110_MAX_FRAME_LENGTH + 1];
         int8_t _radarDataFramePosition = 0;
 
         bool _isFrameStarted = false;

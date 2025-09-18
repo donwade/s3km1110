@@ -199,20 +199,37 @@ bool s3km1110::readAllRadarConfigs()
 
 bool s3km1110::_read_frame()
 {
-    if (!_uartRadar->available()) { return false; }
+
+    if (!_uartRadar || !_uartRadar->available()) { return false; }
 
     bool isSuccess = false;
     uint8_t _readData = _uartRadar->read();
 
-    if (_isFrameStarted == false) {
-        if (_readData == 0xF4) {
+    if (_isFrameStarted == false) 
+    {
+        if (0)
+        {
+        }
+        else if (_readData == 0xAA)
+        {
             _radarDataFrame[_radarDataFramePosition++] = _readData;
             _isFrameStarted = true;
             _isCommandFrame = false;
-        } else if (_readData == 0xFD) {
+            _isDebugFrame = true;
+        }
+        else if (_readData == 0xF4) 
+        {
+            _radarDataFrame[_radarDataFramePosition++] = _readData;
+            _isFrameStarted = true;
+            _isCommandFrame = false;
+            _isDebugFrame = false;
+            
+        } else if (_readData == 0xFD) 
+        {
             _radarDataFrame[_radarDataFramePosition++] = _readData;
             _isFrameStarted = true;
             _isCommandFrame = true;
+            _isDebugFrame = false;
         }
         else
         {
@@ -236,14 +253,26 @@ bool s3km1110::_read_frame()
         else
         {
         	// frame not overflowed keep collecting.
+			assert(_radarDataFramePosition < S3KM1110_MAX_FRAME_LENGTH);
+			
             _radarDataFrame[_radarDataFramePosition++] = _readData;
-
+			
             if (_radarDataFramePosition >= 8) 
             {
             	// where in the payload area look for
             	// end of frame sequence
             	
-                if (_isDataFrameComplete()) 
+          		if (0)  // yes it looks dumb.
+          		{
+          		}
+          	/*      else if (_isDebugFrameComplete())
+				{
+					isSuccess = _parseDebugFrame();
+					_isFrameStarted = false;
+					_radarDataFramePosition = 0;
+				}
+		 	*/
+                else if (_isDataFrameComplete()) 
                 {
                     isSuccess = _parseDataFrame();
                     _isFrameStarted = false;
@@ -256,13 +285,6 @@ bool s3km1110::_read_frame()
                     _radarDataFramePosition = 0;
                 }
                 
-                else if (_isDebugFrameComplete())
-				{
-					isSuccess = _parseDebugFrame();
-					_isFrameStarted = false;
-					_radarDataFramePosition = 0;
-				}
-				
             }
         }
     }
@@ -316,7 +338,9 @@ bool s3km1110::_isDebugFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 2] == 0xFB &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0xFA;
 
-		if (!ret || _uartDebug == nullptr) { return ret; }
+		if (ret == 0) return ret;
+		if (_uartDebug == nullptr) return ret;
+		
 		_uartDebug->printf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
      return ret;
@@ -501,7 +525,18 @@ bool s3km1110::_parseDebugFrame()
 {
 	bool isSuccess = false;
 
-#if 0 //ssssssssssssssssssssssssss
+#ifdef S3KM1110_DEBUG_DATA
+    if (_uartDebug != nullptr) {
+        _uartDebug->println(F("––––––––––––––––––––––––––––––––––––––––"));
+        _uartDebug->print(F("DBG DTA: "));
+        
+        _printCurrentFrame("data frame");
+    }
+#endif
+/*
+
+	assert(0);
+	
     uint8_t frame_data_length = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
 
     _lastCommand = _radarDataFrame[6];
@@ -581,12 +616,13 @@ bool s3km1110::_parseDebugFrame()
         #endif
     }
 
-    #ifdef S3KM1110_DEBUG_COMMANDS
+*/
+#ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
         _uartDebug->println(F("–––––––––––––––––––––––––––––––––––––––––––––"));
     }
-    #endif
 #endif
+
     return isSuccess;
 }
 
@@ -673,7 +709,8 @@ bool s3km1110::_sendCommandAndWait(
     String payloadStr = payloadSize > 0 ? _intToHex(payload, payloadSize) : "";
     String totalSizeStr = _intToHex(S3KM1110_FRAME_COMMAND_SIZE + subCommandSize + payloadSize, S3KM1110_FRAME_LENGTH_SIZE);
     
-    if (isSkipCommandMode || _openCommandMode()) {
+    if (isSkipCommandMode || _openCommandMode())
+    {
         delay(50);
         _sendHexData(_getCommandPrefix() + totalSizeStr + commandStr + subCommandStr + payloadStr + _getCommandPostfix());
 
@@ -693,7 +730,10 @@ bool s3km1110::_sendCommandAndWait(
     }
 
     delay(50);
-    if (!isSkipCommandMode) { _closeCommandMode(); }
+
+    if (!isSkipCommandMode) {
+    	_closeCommandMode(); 
+    }
     return false;
 }
 
