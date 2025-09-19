@@ -249,6 +249,7 @@ bool s3km1110::_read_frame()
             _radarDataFramePosition = 0;
             _isFrameStarted = false;
             _isDebugFrame = false;
+            _isCommandFrame = false;
         } 
         else
         {
@@ -265,14 +266,13 @@ bool s3km1110::_read_frame()
           		if (0)  // yes it looks dumb.
           		{
           		}
-          	/*      else if (_isDebugFrameComplete())
+          	    else if (_isDebugFrameComplete())
 				{
 					isSuccess = _parseDebugFrame();
 					_isFrameStarted = false;
 					_radarDataFramePosition = 0;
 				}
-		 	*/
-                else if (_isDataFrameComplete()) 
+		 	    else if (_isDataFrameComplete()) 
                 {
                     isSuccess = _parseDataFrame();
                     _isFrameStarted = false;
@@ -318,8 +318,7 @@ bool s3km1110::_isDataFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 2] == 0xF6 &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0xF5;
       
-	  //if (_uartDebug == nullptr) { return ret; }
-	  //dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	  if (ret) dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 	  return ret;  
 }
 
@@ -336,9 +335,7 @@ bool s3km1110::_isDebugFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 2] == 0xFB &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0xFA;
 
-		if (ret == 0) return ret;
-		
-		dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+		if (ret) dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
      return ret;
 }
@@ -357,8 +354,7 @@ bool s3km1110::_isCommandFrameComplete() // command formats
         _radarDataFrame[_radarDataFramePosition - 2] == 0x02 &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0x01;
 
-	//if (_uartDebug == nullptr) { return ret; }
-	//dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	if (ret) dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
     return ret;
 }

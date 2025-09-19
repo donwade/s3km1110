@@ -80,8 +80,8 @@ void setup(void)
         }
     }
 
-    //radar._enableReportMode();  //SOP :)
-    radar._enableDebugMode();
+    radar._enableReportMode();  //SOP :)
+    //radar._enableDebugMode();
     //radar._enableNormalMode();
 
     
