@@ -3,6 +3,11 @@
 
 #include "s3km1110.h"
 
+#define dprintln _uartDebug->println
+#define dprintf _uartDebug->printf
+#define dprint  _uartDebug->print
+
+
 #define S3KM1110_FRAME_COMMAND_SIZE 2
 #define S3KM1110_FRAME_LENGTH_SIZE 2
 
@@ -238,7 +243,7 @@ bool s3km1110::_read_frame()
         {
             #if defined(S3KM1110_DEBUG_COMMANDS) || defined(S3KM1110_DEBUG_DATA)
             if (_uartDebug != nullptr) {
-                _uartDebug->println(F("[Error] Frame out of size"));
+                dprintln(F("[Error] Frame out of size"));
             }
             #endif
             _radarDataFramePosition = 0;
@@ -292,13 +297,13 @@ void s3km1110::_printCurrentFrame(const char *title)
     #if defined(S3KM1110_DEBUG_COMMANDS) || defined(S3KM1110_DEBUG_DATA)
     if (_uartDebug == nullptr) { return; }
 
-    _uartDebug->println(title);
+    dprintln(title);
     for (uint8_t idx = 0; idx < _radarDataFramePosition; idx++) {
-        if (_radarDataFrame[idx] < 0x10) { _uartDebug->print('0'); }
-        _uartDebug->print(_radarDataFrame[idx], HEX);
-        _uartDebug->print(' ');
+        if (_radarDataFrame[idx] < 0x10) { dprint('0'); }
+        dprint(_radarDataFrame[idx], HEX);
+        dprint(' ');
     }
-    _uartDebug->println(' ');
+    dprintln(' ');
     #endif
 }
 
@@ -316,7 +321,7 @@ bool s3km1110::_isDataFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 1] == 0xF5;
       
 	  //if (_uartDebug == nullptr) { return ret; }
-	  //_uartDebug->printf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	  //dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 	  return ret;  
 }
 
@@ -336,7 +341,7 @@ bool s3km1110::_isDebugFrameComplete()  // report mode
 		if (ret == 0) return ret;
 		if (_uartDebug == nullptr) return ret;
 		
-		_uartDebug->printf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+		dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
      return ret;
 }
@@ -356,7 +361,7 @@ bool s3km1110::_isCommandFrameComplete() // command formats
         _radarDataFrame[_radarDataFramePosition - 1] == 0x01;
 
 	//if (_uartDebug == nullptr) { return ret; }
-	//_uartDebug->printf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	//dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
     return ret;
 }
@@ -367,8 +372,8 @@ bool s3km1110::_parseDataFrame()
 
     #ifdef S3KM1110_DEBUG_DATA
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("––––––––––––––––––––––––––––––––––––––––"));
-        _uartDebug->print(F("RCV DTA: "));
+        dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
+        dprint(F("RCV DTA: "));
         
         _printCurrentFrame("data frame");
     }
@@ -381,12 +386,12 @@ bool s3km1110::_parseDataFrame()
 
         #ifdef S3KM1110_DEBUG_DATA
         if (_uartDebug != nullptr) {
-            _uartDebug->printf("Detected: %x | Distance: %u\n", detectionResultRaw, distanceToTarget);
-            _uartDebug->print(F("Gate energy:\n"));
+            dprintf("Detected: %x | Distance: %u\n", detectionResultRaw, distanceToTarget);
+            dprint(F("Gate energy:\n"));
             for (uint8_t i = 0; i < S3KM1110_DISTANE_GATE_COUNT; i++) {
-                _uartDebug->printf("%02u\t", i);
+                dprintf("%02u\t", i);
             }
-            _uartDebug->print('\n');
+            dprint('\n');
         }
         #endif
 
@@ -397,13 +402,13 @@ bool s3km1110::_parseDataFrame()
 
             #ifdef S3KM1110_DEBUG_DATA
             if (_uartDebug != nullptr) {
-                _uartDebug->printf("%02u\t", distanceGateEnergy[idx]);
+                dprintf("%02u\t", distanceGateEnergy[idx]);
             }
             #endif
         }
         #ifdef S3KM1110_DEBUG_DATA
         if (_uartDebug != nullptr) {
-            _uartDebug->print('\n');
+            dprint('\n');
         }
         #endif
 
@@ -411,16 +416,16 @@ bool s3km1110::_parseDataFrame()
     } else {
         #ifdef S3KM1110_DEBUG_DATA
         if (_uartDebug != nullptr) {
-            _uartDebug->print(F("\nFrame length unexpected: "));
-            _uartDebug->print(_radarDataFramePosition);
-            _uartDebug->print('\n');
+            dprint(F("\nFrame length unexpected: "));
+            dprint(_radarDataFramePosition);
+            dprint('\n');
         }
         #endif
     }
 
     #ifdef S3KM1110_DEBUG_DATA
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("––––––––––––––––––––––––––––––––––––––––"));
+        dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
     }
     #endif
     return false;
@@ -450,18 +455,18 @@ bool s3km1110::_parseCommandFrame()
 
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("–––––––––––––––––––––––––––––––––––––––––––––"));
-        _uartDebug->print(F("RCV ACK: "));
+        dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
+        dprint(F("RCV ACK: "));
         
         _printCurrentFrame("command frame");
         
-        _uartDebug->printf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
+        dprintf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
         if (frame_payload_length > 0) {
-            _uartDebug->print(F("Raw payload: "));
+            dprint(F("Raw payload: "));
             for (uint8_t idx = 0; idx < frame_payload_length; idx++) {
-                _uartDebug->printf("%02x ", payloadBytes[idx]);
+                dprintf("%02x ", payloadBytes[idx]);
             }
-            _uartDebug->print('\n');
+            dprint('\n');
         }
     }
     #endif
@@ -503,14 +508,14 @@ bool s3km1110::_parseCommandFrame()
     {
         #ifdef S3KM1110_DEBUG_COMMANDS
         if (_uartDebug != nullptr) {
-            _uartDebug->print("[ERROR] Receive Unknown Command\n");
+            dprint("[ERROR] Receive Unknown Command\n");
         }
         #endif
     }
 
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("–––––––––––––––––––––––––––––––––––––––––––––"));
+        dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
     }
     #endif
     return isSuccess;
@@ -522,8 +527,8 @@ bool s3km1110::_parseDebugFrame()
 
 #ifdef S3KM1110_DEBUG_DATA
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("––––––––––––––––––––––––––––––––––––––––"));
-        _uartDebug->print(F("DBG DTA: "));
+        dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
+        dprint(F("DBG DTA: "));
         
         _printCurrentFrame("data frame");
     }
@@ -554,16 +559,16 @@ bool s3km1110::_parseDebugFrame()
 
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("–––––––––––––––––––––––––––––––––––––––––––––"));
+        dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
         _uartDebug->print(F("RCV ACK: "));
         
         _printCurrentFrame("command frame");
         
-        _uartDebug->printf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
+        dprintf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
         if (frame_payload_length > 0) {
             _uartDebug->print(F("Raw payload: "));
             for (uint8_t idx = 0; idx < frame_payload_length; idx++) {
-                _uartDebug->printf("%02x ", payloadBytes[idx]);
+                dprintf("%02x ", payloadBytes[idx]);
             }
             _uartDebug->print('\n');
         }
@@ -614,7 +619,7 @@ bool s3km1110::_parseDebugFrame()
 */
 #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->println(F("–––––––––––––––––––––––––––––––––––––––––––––"));
+        dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
     }
 #endif
 
@@ -673,10 +678,10 @@ void s3km1110::_sendHexData(String rawData)
 {
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->print(F("SND: ["));
-        _uartDebug->print(rawData.length());
-        _uartDebug->print(F("] "));
-        _uartDebug->println(rawData);
+        dprint(F("SND: ["));
+        dprint(rawData.length());
+        dprint(F("] "));
+        dprintln(rawData);
     }
     #endif
 
