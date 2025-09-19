@@ -6,6 +6,7 @@
 #define dprintln _uartDebug->println
 #define dprintf _uartDebug->printf
 #define dprint  _uartDebug->print
+#define dwrite  _uartDebug->write
 
 
 #define S3KM1110_FRAME_COMMAND_SIZE 2
@@ -50,9 +51,10 @@ bool s3km1110::begin(Stream &dataStream, Stream &debugStream)
     // UARTs
     _uartRadar = &dataStream;
     _uartDebug = &debugStream;
+    
     #if defined(ESP8266)
     if (&debugStream == &Serial) {
-        _uartDebug->write(17); //Send an XON to stop the hung terminal after reset on ESP8266
+        dwrite(17); //Send an XON to stop the hung terminal after reset on ESP8266
     }
     #endif
 
@@ -242,9 +244,7 @@ bool s3km1110::_read_frame()
         if (_radarDataFramePosition >= S3KM1110_MAX_FRAME_LENGTH)
         {
             #if defined(S3KM1110_DEBUG_COMMANDS) || defined(S3KM1110_DEBUG_DATA)
-            if (_uartDebug != nullptr) {
                 dprintln(F("[Error] Frame out of size"));
-            }
             #endif
             _radarDataFramePosition = 0;
             _isFrameStarted = false;
@@ -295,15 +295,13 @@ bool s3km1110::_read_frame()
 void s3km1110::_printCurrentFrame(const char *title)
 {
     #if defined(S3KM1110_DEBUG_COMMANDS) || defined(S3KM1110_DEBUG_DATA)
-    if (_uartDebug == nullptr) { return; }
-
-    dprintln(title);
-    for (uint8_t idx = 0; idx < _radarDataFramePosition; idx++) {
-        if (_radarDataFrame[idx] < 0x10) { dprint('0'); }
-        dprint(_radarDataFrame[idx], HEX);
-        dprint(' ');
-    }
-    dprintln(' ');
+	    dprintln(title);
+	    for (uint8_t idx = 0; idx < _radarDataFramePosition; idx++) {
+	        if (_radarDataFrame[idx] < 0x10) { dprint('0'); }
+	        dprint(_radarDataFrame[idx], HEX);
+	        dprint(' ');
+	    }
+	    dprintln(' ');
     #endif
 }
 
@@ -339,7 +337,6 @@ bool s3km1110::_isDebugFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 1] == 0xFA;
 
 		if (ret == 0) return ret;
-		if (_uartDebug == nullptr) return ret;
 		
 		dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
@@ -371,12 +368,10 @@ bool s3km1110::_parseDataFrame()
     uint8_t frame_data_length = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
 
     #ifdef S3KM1110_DEBUG_DATA
-    if (_uartDebug != nullptr) {
         dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
         dprint(F("RCV DTA: "));
         
         _printCurrentFrame("data frame");
-    }
     #endif
 
     if (frame_data_length == 35) {
@@ -385,14 +380,12 @@ bool s3km1110::_parseDataFrame()
         isTargetDetected = detectionResultRaw == 0x01;
 
         #ifdef S3KM1110_DEBUG_DATA
-        if (_uartDebug != nullptr) {
             dprintf("Detected: %x | Distance: %u\n", detectionResultRaw, distanceToTarget);
             dprint(F("Gate energy:\n"));
             for (uint8_t i = 0; i < S3KM1110_DISTANE_GATE_COUNT; i++) {
                 dprintf("%02u\t", i);
             }
             dprint('\n');
-        }
         #endif
 
         uint8_t distanceGateStart = 9;
@@ -401,32 +394,24 @@ bool s3km1110::_parseDataFrame()
             distanceGateEnergy[idx] = energy;
 
             #ifdef S3KM1110_DEBUG_DATA
-            if (_uartDebug != nullptr) {
                 dprintf("%02u\t", distanceGateEnergy[idx]);
-            }
             #endif
         }
         #ifdef S3KM1110_DEBUG_DATA
-        if (_uartDebug != nullptr) {
             dprint('\n');
-        }
         #endif
 
         return true;
     } else {
         #ifdef S3KM1110_DEBUG_DATA
-        if (_uartDebug != nullptr) {
             dprint(F("\nFrame length unexpected: "));
             dprint(_radarDataFramePosition);
             dprint('\n');
-        }
         #endif
     }
 
     #ifdef S3KM1110_DEBUG_DATA
-    if (_uartDebug != nullptr) {
         dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
-    }
     #endif
     return false;
 }
@@ -454,21 +439,21 @@ bool s3km1110::_parseCommandFrame()
     }
 
     #ifdef S3KM1110_DEBUG_COMMANDS
-    if (_uartDebug != nullptr) {
         dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
         dprint(F("RCV ACK: "));
         
         _printCurrentFrame("command frame");
         
         dprintf("CMD: 0x%02x | Status: %s | Body: %u | Payload: %u\n", _lastCommand, _isLatestCommandSuccess ? "Ok" : "Failed", frame_data_length, frame_payload_length);
-        if (frame_payload_length > 0) {
+        if (frame_payload_length > 0) 
+        {
             dprint(F("Raw payload: "));
-            for (uint8_t idx = 0; idx < frame_payload_length; idx++) {
+            for (uint8_t idx = 0; idx < frame_payload_length; idx++) 
+            {
                 dprintf("%02x ", payloadBytes[idx]);
             }
             dprint('\n');
         }
-    }
     #endif
 
     bool isSuccess = false;
@@ -507,16 +492,12 @@ bool s3km1110::_parseCommandFrame()
     else 
     {
         #ifdef S3KM1110_DEBUG_COMMANDS
-        if (_uartDebug != nullptr) {
             dprint("[ERROR] Receive Unknown Command\n");
-        }
         #endif
     }
 
     #ifdef S3KM1110_DEBUG_COMMANDS
-    if (_uartDebug != nullptr) {
         dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
-    }
     #endif
     return isSuccess;
 }
@@ -526,12 +507,9 @@ bool s3km1110::_parseDebugFrame()
 	bool isSuccess = false;
 
 #ifdef S3KM1110_DEBUG_DATA
-    if (_uartDebug != nullptr) {
         dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
         dprint(F("DBG DTA: "));
-        
         _printCurrentFrame("data frame");
-    }
 #endif
 /*
 
@@ -618,9 +596,7 @@ bool s3km1110::_parseDebugFrame()
 
 */
 #ifdef S3KM1110_DEBUG_COMMANDS
-    if (_uartDebug != nullptr) {
         dprintln(F("–––––––––––––––––––––––––––––––––––––––––––––"));
-    }
 #endif
 
     return isSuccess;
@@ -677,12 +653,10 @@ bool s3km1110::_closeCommandMode()
 void s3km1110::_sendHexData(String rawData)
 {
     #ifdef S3KM1110_DEBUG_COMMANDS
-    if (_uartDebug != nullptr) {
         dprint(F("SND: ["));
         dprint(rawData.length());
         dprint(F("] "));
         dprintln(rawData);
-    }
     #endif
 
     unsigned int count = rawData.length();
