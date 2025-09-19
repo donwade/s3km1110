@@ -37,7 +37,12 @@ HardwareSerial S3km11110(2);
   #define RADAR_TX_PIN 1
 #endif
 
+char x[100];
+Stream *_uartRadar;  // major fix. MOVE OUTSIDE OF CLASS
+Stream *_uartDebug;
+
 s3km1110 radar;
+char y[100];
 
 uint32_t lastReading = 0;
 uint16_t lastDistance = 0;
@@ -50,10 +55,11 @@ bool isDetected = false;
 void setup(void)
 {
     MONITOR_SERIAL.begin(115200);
+
     #if defined(ESP32)
-    RADAR_SERIAL.begin(115200, SERIAL_8N1, RADAR_RX_PIN, RADAR_TX_PIN); //UART for monitoring the radar
+	    RADAR_SERIAL.begin(115200, SERIAL_8N1, RADAR_RX_PIN, RADAR_TX_PIN); //UART for monitoring the radar
     #elif defined(__AVR_ATmega32U4__)
-    RADAR_SERIAL.begin(115200); //UART for monitoring the radar
+	    RADAR_SERIAL.begin(115200); //UART for monitoring the radar
     #endif
 
 	pinMode(PIN_LED, OUTPUT);
@@ -62,10 +68,6 @@ void setup(void)
     bool isRadarEnabled = radar.begin(RADAR_SERIAL, MONITOR_SERIAL);
     Serial.printf("Radar status: %s\n", isRadarEnabled ? "Ok" : "Failed");  
     
-    radar._enableReportMode();  //SOP :)
-    //radar._enableDebugMode();
-    //radar._enableNormalMode();
-
     if (isRadarEnabled) 
     {
     	radar.setRadarConfigurationDelay(2);
@@ -77,6 +79,11 @@ void setup(void)
                                 config.detectionGatesMin, config.detectionGatesMax, config.activeFrameNum, config.inactiveFrameNum, config.delay);
         }
     }
+
+    //radar._enableReportMode();  //SOP :)
+    radar._enableDebugMode();
+    //radar._enableNormalMode();
+
     
 }
 

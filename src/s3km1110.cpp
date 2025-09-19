@@ -51,10 +51,6 @@ bool s3km1110::begin(Stream &dataStream, Stream &debugStream)
     }
     #endif
 
-    if (!_uartRadar) {
-        return false;
-    }
-
     return true;
 }
 
@@ -177,13 +173,13 @@ bool s3km1110::readAllRadarConfigs()
 	LINE;	
 	bool ok = readRadarConfigMinimumGates();
 	LINE;	
-	ok |= readRadarConfigMaximumGates();
+	ok &= readRadarConfigMaximumGates();
 	LINE;	
-	ok |= readRadarConfigActiveFrameNumber();
+	ok &= readRadarConfigActiveFrameNumber();
 	LINE;	
-	ok |= readRadarConfigInactiveFrameNumber();
+	ok &= readRadarConfigInactiveFrameNumber();
 	LINE;	
-	ok |= readRadarConfigDelay();
+	ok &= readRadarConfigDelay();
 	LINE;	
     return ok;
 #if 0    
@@ -199,8 +195,7 @@ bool s3km1110::readAllRadarConfigs()
 
 bool s3km1110::_read_frame()
 {
-
-    if (!_uartRadar || !_uartRadar->available()) { return false; }
+    if (!_uartRadar->available()) { return false; }
 
     bool isSuccess = false;
     uint8_t _readData = _uartRadar->read();
@@ -678,7 +673,9 @@ void s3km1110::_sendHexData(String rawData)
 {
     #ifdef S3KM1110_DEBUG_COMMANDS
     if (_uartDebug != nullptr) {
-        _uartDebug->print(F("SND: "));
+        _uartDebug->print(F("SND: ["));
+        _uartDebug->print(rawData.length());
+        _uartDebug->print(F("] "));
         _uartDebug->println(rawData);
     }
     #endif

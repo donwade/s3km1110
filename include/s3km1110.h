@@ -19,6 +19,9 @@ struct s3km1110ConfigParameters
     uint16_t delay = 0;              // 0~65535 | Target disappearance delay time (sec)
 };
 
+extern Stream *_uartRadar;
+extern Stream *_uartDebug;
+
 
 class s3km1110 {
 
@@ -62,8 +65,8 @@ class s3km1110 {
 
     protected:
     private:
-        Stream *_uartRadar = nullptr;
-        Stream *_uartDebug = nullptr;
+//        Stream *_uartRadar = nullptr;
+//        Stream *_uartDebug = nullptr;
 
         const uint32_t kRadarUartcommandTimeout = 100;
         uint32_t _radarUartLastPacketTime = 0;
