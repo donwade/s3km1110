@@ -58,6 +58,7 @@ bool s3km1110::begin(Stream &dataStream, Stream &debugStream)
     }
     #endif
 
+	_syncIndex = 0;
     return true;
 }
 
@@ -205,41 +206,85 @@ bool s3km1110::_read_frame()
     if (!_uartRadar->available()) { return false; }
 
     bool isSuccess = false;
+    
     uint8_t _readData = _uartRadar->read();
 
     if (_isFrameStarted == false) 
     {
+    	//dprintf("<%02x %d > ", _readData, _radarDataFramePosition);
+    	
         if (0)
         {
         }
-        else if (_readData == 0xAA)
+        else if (_readData == _syncDebugSeq[_syncIndex])
         {
-            _radarDataFrame[_radarDataFramePosition++] = _readData;
-            _isFrameStarted = true;
-            _isCommandFrame = false;
-            _isDebugFrame = true;
+        	dprintf("i=%d r=%02x a=%02x\n",
+        				_syncIndex,
+        				_readData,
+        				_syncDebugSeq[_syncIndex]);
+        				
+			_radarDataFrame[_radarDataFramePosition++] = _readData;
+			_syncIndex++;
+			
+			if ( _syncIndex == sizeof(_syncDataSeq))
+			{
+	            _isFrameStarted = true;
+	            _isCommandFrame = false;
+	            _isDebugFrame = true;
+	            _syncIndex = 0;
+	        }
         }
-        else if (_readData == 0xF4) 
+        else if (_readData == _syncDataSeq[_syncIndex]) 
         {
-            _radarDataFrame[_radarDataFramePosition++] = _readData;
-            _isFrameStarted = true;
-            _isCommandFrame = false;
-            _isDebugFrame = false;
-            
-        } else if (_readData == 0xFD) 
+        	dprintf("i=%d r=%02x a=%02x\n",
+        				_syncIndex,
+        				_readData,
+        				_syncDataSeq[_syncIndex]);
+        				
+			_radarDataFrame[_radarDataFramePosition++] = _readData;
+	      	_syncIndex++;
+	      	
+        	if ( _syncIndex == sizeof(_syncDataSeq))
+        	{
+	            _isFrameStarted = true;
+	            _isCommandFrame = false;
+	            _isDebugFrame = false;
+	            _syncIndex = 0;
+	        }
+        } 
+        else if (_readData == _syncCommandSeq[_syncIndex]) 
         {
-            _radarDataFrame[_radarDataFramePosition++] = _readData;
-            _isFrameStarted = true;
-            _isCommandFrame = true;
-            _isDebugFrame = false;
+			dprintf("i=%d r=%02x a=%02x\n",
+						_syncIndex,
+						_readData,
+						_syncCommandSeq[_syncIndex]);
+					
+        	_syncIndex++;
+			_radarDataFrame[_radarDataFramePosition++] = _readData;
+			
+        	if ( _syncIndex == sizeof(_syncCommandSeq))
+        	{
+ 	            _isFrameStarted = true;
+	            _isCommandFrame = true;
+	            _isDebugFrame = false;
+	            _syncIndex = 0;
+	        }
         }
         else
         {
-        	// no frame start byte found.... keep searching
+        	// NOBODY took the bait restart.
+			_isFrameStarted = false;
+			_isCommandFrame = false;
+			_isDebugFrame = false;
+			_syncIndex = 0;
+        	// no frame start seq found.... keep searching
         }
     }
     else
     {
+    	//dprintf("[%3d]=%02X ", _radarDataFramePosition, _readData);
+    	dprintf("%02X ", _readData);
+
     	// detect if frame overflow
         if (_radarDataFramePosition >= S3KM1110_MAX_FRAME_LENGTH)
         {
@@ -271,18 +316,21 @@ bool s3km1110::_read_frame()
 					isSuccess = _parseDebugFrame();
 					_isFrameStarted = false;
 					_radarDataFramePosition = 0;
+					_syncIndex = 0;
 				}
 		 	    else if (_isDataFrameComplete()) 
                 {
                     isSuccess = _parseDataFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
+					_syncIndex = 0;
                 } 
                 else if (_isCommandFrameComplete())
                 {
                     isSuccess = _parseCommandFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
+					_syncIndex = 0;
                 }
                 
             }
@@ -354,7 +402,7 @@ bool s3km1110::_isCommandFrameComplete() // command formats
         _radarDataFrame[_radarDataFramePosition - 2] == 0x02 &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0x01;
 
-	if (ret) dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	if (ret) dprintf("\n%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
 
     return ret;
 }

@@ -65,15 +65,13 @@ class s3km1110 {
 
     protected:
     private:
-//        Stream *_uartRadar = nullptr;
-//        Stream *_uartDebug = nullptr;
 
         const uint32_t kRadarUartcommandTimeout = 100;
         uint32_t _radarUartLastPacketTime = 0;
         uint32_t _radarUartLastCommandTime = 0;
 
         uint8_t _radarDataFrame[S3KM1110_MAX_FRAME_LENGTH + 1];
-        int8_t _radarDataFramePosition = 0;
+        int16_t _radarDataFramePosition = 0;
 
         bool _isFrameStarted = false;
         bool _isCommandFrame = false;
@@ -86,6 +84,12 @@ class s3km1110 {
         void _printCurrentFrame(const char *msg);
 
         bool _read_frame();
+
+        uint8_t _syncIndex;
+        const uint8_t _syncCommandSeq[4] = {0xFD, 0xFC, 0xFB, 0xFA };
+        const uint8_t _syncDataSeq[4] =    {0xF4, 0xF3, 0xF2, 0xF1 };
+        const uint8_t _syncDebugSeq[4] =   {0xAA, 0xBF, 0x10, 0x14 }; 
+
         bool _isDataFrameComplete();
         bool _isCommandFrameComplete();
         bool _isDebugFrameComplete();
