@@ -288,8 +288,7 @@ bool s3km1110::_read_frame()
     }
     else
     {
-    	//dprintf("[%3d]=%02X ", _radarDataFramePosition, _readData);
-    	dprintf("%02X ", _readData);
+    	//dprintf("+%02X ", _readData);
 
     	// detect if frame overflow
         if (_radarDataFramePosition >= S3KM1110_MAX_FRAME_LENGTH)
@@ -319,6 +318,7 @@ bool s3km1110::_read_frame()
           		}
           	    else if (_isDebugFrameComplete())
 				{
+					dprint('\n');
 					isSuccess = _parseDebugFrame();
 					_isFrameStarted = false;
 					_radarDataFramePosition = 0;
@@ -326,6 +326,7 @@ bool s3km1110::_read_frame()
 				}
 		 	    else if (_isDataFrameComplete()) 
                 {
+					dprint('\n');
                     isSuccess = _parseDataFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
@@ -333,6 +334,7 @@ bool s3km1110::_read_frame()
                 } 
                 else if (_isCommandFrameComplete())
                 {
+					dprint('\n');
                     isSuccess = _parseCommandFrame();
                     _isFrameStarted = false;
                     _radarDataFramePosition = 0;
@@ -371,8 +373,11 @@ bool s3km1110::_isDataFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 3] == 0xF7 &&
         _radarDataFrame[_radarDataFramePosition - 2] == 0xF6 &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0xF5;
+
       
-	  if (ret) dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	#ifdef DEBUG_SYNC
+	  if (ret) dprintf("\n%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	#endif  
 	  return ret;  
 }
 
@@ -389,8 +394,10 @@ bool s3km1110::_isDebugFrameComplete()  // report mode
         _radarDataFrame[_radarDataFramePosition - 2] == 0xFB &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0xFA;
 
-		if (ret) dprintf("%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
-
+	#ifdef DEBUG_SYNC
+		if (ret) dprintf("\n%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	#endif
+	
      return ret;
 }
 
@@ -408,61 +415,78 @@ bool s3km1110::_isCommandFrameComplete() // command formats
         _radarDataFrame[_radarDataFramePosition - 2] == 0x02 &&
         _radarDataFrame[_radarDataFramePosition - 1] == 0x01;
 
-	if (ret) dprintf("\n%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
-
+	#ifdef DEBUG_SYNC
+		if (ret) dprintf("\n%s:%d ret = %d\n", __FUNCTION__, __LINE__, ret);
+	#endif
+	
     return ret;
 }
 
 bool s3km1110::_parseDataFrame()
 {
+
     uint8_t frame_data_length = _radarDataFrame[4] + (_radarDataFrame[5] << 8);
 
-    #ifdef S3KM1110_DEBUG_DATA
-        dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
+    #if 0 //def S3KM1110_DEBUG_DATA
+        dprintln(HARDLINE);
         dprint(F("RCV DTA: "));
         
         _printCurrentFrame("data frame");
     #endif
 
-    if (frame_data_length == 35) {
+    if (frame_data_length == 35) 
+    {
         uint8_t detectionResultRaw = _radarDataFrame[6];
+        
         distanceToTarget = _radarDataFrame[7] + (_radarDataFrame[8] << 8);
+        
         isTargetDetected = detectionResultRaw == 0x01;
 
-        #ifdef S3KM1110_DEBUG_DATA
             dprintf("Detected: %x | Distance: %u\n", detectionResultRaw, distanceToTarget);
             dprint(F("Gate energy:\n"));
-            for (uint8_t i = 0; i < S3KM1110_DISTANE_GATE_COUNT; i++) {
-                dprintf("%02u\t", i);
-            }
-            dprint('\n');
-        #endif
 
-        uint8_t distanceGateStart = 9;
-        for (uint8_t idx = 0; idx < S3KM1110_DISTANE_GATE_COUNT; idx++) {
-            uint16_t energy = _radarDataFrame[distanceGateStart + idx] + (_radarDataFrame[distanceGateStart + idx + 1] << 8);
+
+        uint8_t offset2energy = 9;
+        for (uint8_t idx = 0; idx < S3KM1110_DISTANE_GATE_COUNT; idx++) 
+        {
+            uint16_t energy =   _radarDataFrame[offset2energy + idx]
+            				 + (_radarDataFrame[offset2energy + idx + 1] << 8);
+            				 
             distanceGateEnergy[idx] = energy;
+		}
 
-            #ifdef S3KM1110_DEBUG_DATA
-                dprintf("%02u\t", distanceGateEnergy[idx]);
-            #endif
-        }
-        #ifdef S3KM1110_DEBUG_DATA
-            dprint('\n');
-        #endif
+		#ifdef S3KM1110_DEBUG_DATA
+			// gate numbers		
+			for (uint8_t i = 0; i < S3KM1110_DISTANE_GATE_COUNT; i++) 
+			{
+				dprintf("  %2u\t", i);
+			}
+			dprint('\n');
+
+			// linear
+	        for (uint8_t idx = 0; idx < S3KM1110_DISTANE_GATE_COUNT; idx++) 
+	        {
+	             dprintf("%5u\t", distanceGateEnergy[idx]);
+	        }
+			dprint('\n');
+			
+			// db
+	        for (uint8_t idx = 0; idx < S3KM1110_DISTANE_GATE_COUNT; idx++) 
+	        {
+	        	float db;
+	        	db = 10. * log((float) distanceGateEnergy[idx] / 0x10000);
+	            dprintf("%4.2f\t", db);
+	        }
+			dprint('\n');
+		#endif
 
         return true;
-    } else {
-        #ifdef S3KM1110_DEBUG_DATA
-            dprint(F("\nFrame length unexpected: "));
-            dprint(_radarDataFramePosition);
-            dprint('\n');
-        #endif
+    }
+    else 
+    {
+        dprintf("\nFrame length expect 35 found %d\n", _radarDataFramePosition);
     }
 
-    #ifdef S3KM1110_DEBUG_DATA
-        dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
-    #endif
     return false;
 }
 
@@ -557,7 +581,7 @@ bool s3km1110::_parseDebugFrame()
 	bool isSuccess = false;
 
 #ifdef S3KM1110_DEBUG_DATA
-        dprintln(F("––––––––––––––––––––––––––––––––––––––––"));
+        dprintln(HARDLINE);
         dprint(F("DBG DTA: "));
         _printCurrentFrame("data frame");
 #endif

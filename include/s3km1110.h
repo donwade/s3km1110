@@ -22,6 +22,7 @@ struct s3km1110ConfigParameters
 extern Stream *_uartRadar;
 extern Stream *_uartDebug;
 
+const char HARDLINE[] = "––––––––––––––––––––––––––––––––––––––––";
 
 class s3km1110 {
 
