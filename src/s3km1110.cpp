@@ -8,6 +8,8 @@
 #define dprint  _uartDebug->print
 #define dwrite  _uartDebug->write
 
+//#define DEBUG_SYNC
+
 
 #define S3KM1110_FRAME_COMMAND_SIZE 2
 #define S3KM1110_FRAME_LENGTH_SIZE 2
@@ -218,11 +220,13 @@ bool s3km1110::_read_frame()
         }
         else if (_readData == _syncDebugSeq[_syncIndex])
         {
+        	#ifdef DEBUG_SYNC
         	dprintf("i=%d r=%02x a=%02x\n",
         				_syncIndex,
         				_readData,
         				_syncDebugSeq[_syncIndex]);
-        				
+			#endif
+			
 			_radarDataFrame[_radarDataFramePosition++] = _readData;
 			_syncIndex++;
 			
@@ -236,11 +240,12 @@ bool s3km1110::_read_frame()
         }
         else if (_readData == _syncDataSeq[_syncIndex]) 
         {
+			#ifdef DEBUG_SYNC
         	dprintf("i=%d r=%02x a=%02x\n",
         				_syncIndex,
         				_readData,
         				_syncDataSeq[_syncIndex]);
-        				
+        	#endif				
 			_radarDataFrame[_radarDataFramePosition++] = _readData;
 	      	_syncIndex++;
 	      	
@@ -254,11 +259,12 @@ bool s3km1110::_read_frame()
         } 
         else if (_readData == _syncCommandSeq[_syncIndex]) 
         {
+			#ifdef DEBUG_SYNC
 			dprintf("i=%d r=%02x a=%02x\n",
 						_syncIndex,
 						_readData,
 						_syncCommandSeq[_syncIndex]);
-					
+			#endif					
         	_syncIndex++;
 			_radarDataFrame[_radarDataFramePosition++] = _readData;
 			
