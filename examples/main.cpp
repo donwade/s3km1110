@@ -92,7 +92,8 @@ void setup(void)
 void loop(void)
 {
 	loop_ota();
-	
+	delay(2);
+#if 1	
     if (radar.isConnected()) {
         lastReading = millis();
         while (millis() - lastReading < 2000) {
@@ -142,4 +143,5 @@ void loop(void)
             }
         }
     }
+#endif
 }

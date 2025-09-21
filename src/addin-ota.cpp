@@ -58,7 +58,7 @@ void setup_ota()
   //  ( 24)     = 12  <<< For 24MHz XTAL
 
 
-	setCpuFrequencyMhz(CPU_FREQ);  // 10 thru 40 ... fails on wifi
+	//setCpuFrequencyMhz(CPU_FREQ);  // 10 thru 40 ... fails on wifi
 
 	Serial.println();
 	TRACE ("-------- CPU FREQ %d/240 -------------------\n", CPU_FREQ);
