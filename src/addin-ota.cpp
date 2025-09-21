@@ -79,7 +79,8 @@ void setup_ota()
 
 	// Port defaults to 3232
 	ArduinoOTA.setPort(3232);
-
+	ArduinoOTA.setTimeout(3000);
+	
 	// Hostname defaults to esp3232-[MAC]
 	ArduinoOTA.setHostname(LOCAL_HOSTNAME);
 	Serial.printf("remote hostname = %s.local\n", LOCAL_HOSTNAME);
