@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <s3km1110.h>
 #include <HardwareSerial.h>
+#include "../include/addin-ota.h"
 
 HardwareSerial S3km11110(2);
 
@@ -84,11 +85,14 @@ void setup(void)
     //radar._enableDebugMode();
     //radar._enableNormalMode();
 
+	setup_ota();
     
 }
 
 void loop(void)
 {
+	loop_ota();
+	
     if (radar.isConnected()) {
         lastReading = millis();
         while (millis() - lastReading < 2000) {
