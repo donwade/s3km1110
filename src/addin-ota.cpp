@@ -14,15 +14,6 @@
 
 //#include "esp_brownout_detector.h" // Include the brownout detector header
 
-#ifndef MY_SSID
-const char *ssid = "wifi";
-const char *password =   "";
-#error WTF
-#else
-const char *ssid = MY_SSID;
-const char *password = MY_SSID_PASSWORD;
-#endif
-
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -66,16 +57,6 @@ void setup_ota()
 	TRACE ("CpuFrequency = %d mHz (normally 240)\n", getCpuFrequencyMhz());
 	TRACE ("APB bus frequency = %d mHz (normally 80)\n",  getApbFrequency()/1000000);
 
-
-	WiFi.mode(WIFI_STA);
-	WiFi.begin(ssid, password);
-
-	while (WiFi.waitForConnectResult() != WL_CONNECTED) 
-	{
-		Serial.println("Connection Failed! Rebooting...");
-		delay(5000); 
-		ESP.restart();
-	}
 
 	// Port defaults to 3232
 	ArduinoOTA.setPort(3232);
